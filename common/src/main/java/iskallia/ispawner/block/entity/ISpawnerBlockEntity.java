@@ -1,13 +1,13 @@
 package iskallia.ispawner.block.entity;
 
+import iskallia.ispawner.init.ModBlocks;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.Tickable;
 
 public class ISpawnerBlockEntity extends BlockEntity implements Tickable {
 
-	public ISpawnerBlockEntity(BlockEntityType<?> type) {
-		super(type);
+	public ISpawnerBlockEntity() {
+		super(ModBlocks.Entity.SPAWNER);
 	}
 
 	@Override
