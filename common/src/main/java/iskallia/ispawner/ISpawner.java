@@ -1,4 +1,4 @@
-package net.examplemod;
+package iskallia.ispawner;
 
 import me.shedaniel.architectury.registry.CreativeTabs;
 import me.shedaniel.architectury.registry.DeferredRegister;
@@ -14,7 +14,7 @@ import net.minecraft.util.registry.Registry;
 import java.util.function.Supplier;
 
 
-public class ExampleMod {
+public class ISpawner {
     public static final String MOD_ID = "examplemod";
     // We can use this if we don't want to use DeferredRegister
     public static final Lazy<Registries> REGISTRIES = new Lazy<>(() -> Registries.get(MOD_ID));
@@ -28,7 +28,7 @@ public class ExampleMod {
     
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(MOD_ID, Registry.ITEM_KEY);
     public static final RegistrySupplier<Item> EXAMPLE_ITEM = ITEMS.register("example_item", () ->
-            new Item(new Item.Settings().group(ExampleMod.EXAMPLE_TAB)));
+            new Item(new Item.Settings().group(ISpawner.EXAMPLE_TAB)));
     
     public static void init() {
         ITEMS.register();

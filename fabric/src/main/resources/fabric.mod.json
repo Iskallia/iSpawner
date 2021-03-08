@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
-  "version": "${version}",
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "id": "ispawner",
+  "version": "1.0",
+  "name": "iSpawner",
+  "description": "Adds better spawner thingies.",
   "authors": [
-    "Me!"
+    "KaptainWutax"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "",
+    "sources": "https://github.com/Iskallia/iSpawner"
   },
-  "license": "Insert License Here",
-  "icon": "assets/examplemod/icon.png",
+  "license": "GPL-3.0",
+  "icon": "todo",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.examplemod.fabric.ExampleModFabric"
+      "iskallia.ispawner.fabric.ISpawnerFabric"
     ]
   },
   "depends": {

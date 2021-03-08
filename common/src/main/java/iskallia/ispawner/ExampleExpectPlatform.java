@@ -1,4 +1,4 @@
-package net.examplemod;
+package iskallia.ispawner;
 
 import me.shedaniel.architectury.annotations.ExpectPlatform;
 import me.shedaniel.architectury.platform.Platform;
