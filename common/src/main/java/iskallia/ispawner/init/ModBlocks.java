@@ -29,7 +29,7 @@ public class ModBlocks extends ModRegistries {
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 	}
 
-	public static class Entity extends ModBlocks {
+	public static class Entities extends ModBlocks {
 		public static BlockEntityType<ISpawnerBlockEntity> SPAWNER;
 
 		public static void register() {
