@@ -4,6 +4,8 @@ import iskallia.ispawner.init.ModMenus;
 import iskallia.ispawner.inventory.SimpleInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
@@ -43,7 +45,44 @@ public class SpawnerScreenHandler extends ScreenHandler {
 
 	@Override
 	public boolean canUse(PlayerEntity player) {
-		return true;
+		return this.getSpawnerInventory().canPlayerUse(player);
+	}
+
+	@Override
+	public ItemStack transferSlot(PlayerEntity player, int index) {
+		ItemStack itemStack = ItemStack.EMPTY;
+		Slot slot = this.slots.get(index);
+
+		if(slot != null && slot.hasStack()) {
+			ItemStack itemStack2 = slot.getStack();
+			itemStack = itemStack2.copy();
+
+			if(index < 3 * 9) {
+				if(!this.insertItem(itemStack2, 3 * 9, this.slots.size(), true)) {
+					return ItemStack.EMPTY;
+				}
+			} else if(!this.insertItem(itemStack2, 0, 3 * 9, false)) {
+				return ItemStack.EMPTY;
+			}
+
+			if(itemStack2.isEmpty()) {
+				slot.setStack(ItemStack.EMPTY);
+			} else {
+				slot.markDirty();
+			}
+		}
+
+		return itemStack;
+	}
+
+	@Override
+	public void close(PlayerEntity player) {
+		super.close(player);
+		this.getSpawnerInventory().onClose(player);
+	}
+
+	public Inventory getSpawnerInventory() {
+		return this.spawnerInventory;
 	}
 
 }

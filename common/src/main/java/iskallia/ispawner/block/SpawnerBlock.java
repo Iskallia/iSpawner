@@ -1,6 +1,7 @@
 package iskallia.ispawner.block;
 
-import iskallia.ispawner.block.entity.ISpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.init.ModItems;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -18,9 +19,9 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
-public class ISpawnerBlock extends BlockWithEntity implements InventoryProvider {
+public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
-	public ISpawnerBlock(Settings settings) {
+	public SpawnerBlock(Settings settings) {
 		super(settings);
 	}
 
@@ -31,6 +32,10 @@ public class ISpawnerBlock extends BlockWithEntity implements InventoryProvider 
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if(player.getStackInHand(hand).getItem() == ModItems.SPAWNER_CONTROLLER) {
+			return ActionResult.PASS;
+		}
+
 		if(world.isClient) {
 			return ActionResult.SUCCESS;
 		}
@@ -47,13 +52,13 @@ public class ISpawnerBlock extends BlockWithEntity implements InventoryProvider 
 
 	@Override
 	public BlockEntity createBlockEntity(BlockView world) {
-		return new ISpawnerBlockEntity();
+		return new SpawnerBlockEntity();
 	}
 
 	@Override
 	public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
-		return blockEntity instanceof ISpawnerBlockEntity ? ((ISpawnerBlockEntity)blockEntity).eggsInventory : null;
+		return blockEntity instanceof SpawnerBlockEntity ? ((SpawnerBlockEntity)blockEntity).inventory : null;
 	}
 
 }

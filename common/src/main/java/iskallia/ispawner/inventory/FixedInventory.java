@@ -1,10 +1,14 @@
 package iskallia.ispawner.inventory;
 
+import iskallia.ispawner.nbt.INBTSerializable;
+import iskallia.ispawner.nbt.NBTConstants;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FixedInventory implements SidedInventory {
+public abstract class FixedInventory implements SidedInventory, INBTSerializable<CompoundTag> {
 
 	protected DefaultedList<ItemStack> stacks;
 	protected Map<Direction, int[]> availableSlots;
@@ -102,6 +106,49 @@ public abstract class FixedInventory implements SidedInventory {
 	@Override
 	public void markDirty() {
 		this.listeners.forEach(listener -> listener.onInventoryChanged(this));
+	}
+
+	@Override
+	public CompoundTag writeToNBT() {
+		CompoundTag nbt = new CompoundTag();
+
+		ListTag stacksList = new ListTag();
+		this.stacks.forEach(stack -> {
+			stacksList.add(stack.toTag(new CompoundTag()));
+		});
+		nbt.put("Stacks", stacksList);
+
+		ListTag slotsList = new ListTag();
+		this.availableSlots.forEach((direction, slots) -> {
+			CompoundTag tag = new CompoundTag();
+			tag.putInt("Direction", direction.ordinal());
+			tag.putIntArray("Slots", slots);
+			slotsList.add(tag);
+		});
+		nbt.put("AvailableSlots", slotsList);
+
+		return nbt;
+	}
+
+	@Override
+	public void readFromNBT(CompoundTag nbt) {
+		this.stacks.clear();
+		this.availableSlots.clear();
+
+		ListTag stacksList = nbt.getList("Stacks", NBTConstants.COMPOUND);
+
+		for(int i = 0; i < stacksList.size() && i < this.stacks.size(); i++) {
+			this.stacks.set(i, ItemStack.fromTag(stacksList.getCompound(i)));
+		}
+
+		ListTag slotsList = nbt.getList("AvailableSlots", NBTConstants.COMPOUND);
+
+		for(int i = 0; i < stacksList.size(); i++) {
+			CompoundTag tag = slotsList.getCompound(i);
+			Direction direction = Direction.values()[tag.getInt("Direction")];
+			int[] slots = tag.getIntArray("Slots");
+			this.availableSlots.put(direction, slots);
+		}
 	}
 
 	@Override

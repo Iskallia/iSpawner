@@ -1,8 +1,8 @@
 package iskallia.ispawner.init;
 
 import com.mojang.datafixers.types.Type;
-import iskallia.ispawner.block.ISpawnerBlock;
-import iskallia.ispawner.block.entity.ISpawnerBlockEntity;
+import iskallia.ispawner.block.SpawnerBlock;
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -24,16 +24,16 @@ public class ModBlocks extends ModRegistries {
 	public static Block SPAWNER;
 
 	public static void register() {
-		SPAWNER = register("spawner", new ISpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
+		SPAWNER = register("spawner", new SpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
 				.requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 	}
 
 	public static class Entities extends ModBlocks {
-		public static BlockEntityType<ISpawnerBlockEntity> SPAWNER;
+		public static BlockEntityType<SpawnerBlockEntity> SPAWNER;
 
 		public static void register() {
-			SPAWNER = register("spawner", ISpawnerBlockEntity::new, ModBlocks.SPAWNER);
+			SPAWNER = register("spawner", SpawnerBlockEntity::new, ModBlocks.SPAWNER);
 		}
 	}
 

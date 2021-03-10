@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayNetworkHandler.class)
-public class MixinClientPlayNetworkHandler {
+public abstract class MixinClientPlayNetworkHandler {
 
 	@Shadow private ClientWorld world;
 
@@ -22,12 +22,13 @@ public class MixinClientPlayNetworkHandler {
 					target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V",
 					shift = At.Shift.AFTER),
 			cancellable = true)
-	public void onBlockEntityUpdate(BlockEntityUpdateS2CPacket packet, CallbackInfo ci) {
+	private void onBlockEntityUpdate(BlockEntityUpdateS2CPacket packet, CallbackInfo ci) {
 		BlockState state = this.world.getBlockState(packet.getPos());
 		BlockEntity blockEntity = this.world.getBlockEntity(packet.getPos());
 
 		if(blockEntity instanceof BaseBlockEntity) {
 			((BaseBlockEntity)blockEntity).read(state, packet.getCompoundTag(), BaseBlockEntity.UpdateType.PACKET);
+			ci.cancel();
 		}
 	}
 
