@@ -28,8 +28,13 @@ public abstract class BaseBlockEntity extends BlockEntity {
 	}
 
 	@Override
+	public CompoundTag toInitialChunkDataTag() {
+		return this.write(super.toInitialChunkDataTag(), UpdateType.INITIAL_PACKET);
+	}
+
+	@Override
 	public final BlockEntityUpdateS2CPacket toUpdatePacket() {
-		return new BlockEntityUpdateS2CPacket(this.getPos(), 127, this.write(new CompoundTag(), UpdateType.PACKET));
+		return new BlockEntityUpdateS2CPacket(this.getPos(), 127, this.write(new CompoundTag(), UpdateType.UPDATE_PACKET));
 	}
 
 	public void sendClientUpdates() {
@@ -42,7 +47,7 @@ public abstract class BaseBlockEntity extends BlockEntity {
 	}
 
 	public enum UpdateType {
-		SERVER, PACKET
+		SERVER, INITIAL_PACKET, UPDATE_PACKET
 	}
 
 }

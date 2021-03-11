@@ -1,12 +1,17 @@
 package iskallia.ispawner.world.spawner;
 
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.block.render.SpawnerBlockRenderer;
 import iskallia.ispawner.util.Color;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Matrix4f;
+import net.minecraft.util.math.Quaternion;
 
 import java.util.*;
 
@@ -18,116 +23,160 @@ public class SpawnerRenderer {
 
 	}
 
-	public void refresh(SpawnerManager manager) {
+	public void refresh(SpawnerBlockEntity entity) {
 		this.faces.clear();
 
-		manager.actions.forEach(entry -> {
-			this.faces.add(new Face(entry.value.getPos(), entry.value.getSide(), SpawnerBlockRenderer.getColorFor(entry.weight)));
+		entity.manager.actions.forEach(entry -> {
+			this.faces.add(new Face(entry.value.getPos().rotate(entity.getRotation()),
+					entity.getRotation().rotate(entry.value.getSide()), entry.weight));
 		});
 	}
 
-	public void render(MatrixStack matrices, VertexConsumer vertexConsumer, BlockPos center) {
-		new ArrayList<>(this.faces).forEach(face -> face.render(matrices, vertexConsumer, this.faces, center));
+	public void render(MatrixStack matrices, VertexConsumer vertexConsumer, SpawnerBlockEntity entity) {
+		new ArrayList<>(this.faces).stream()
+				.sorted(Comparator.comparingInt(o -> o.weight))
+				.forEach(face -> face.render(matrices, vertexConsumer, this.faces, entity.getOffset()));
 	}
 
 	public static class Face {
 		private final BlockPos pos;
 		private final Direction side;
+		private final int weight;
 		private final Color color;
 
-		public Face(BlockPos pos, Direction side, Color color) {
+		public Face(BlockPos pos, Direction side, int weight) {
 			this.pos = pos;
 			this.side = side;
-			this.color = color;
+			this.weight = weight;
+			this.color = SpawnerBlockRenderer.getColorFor(this.weight);
 		}
 
-		public void render(MatrixStack matrices, VertexConsumer vertexConsumer, Collection<Face> neighbors, BlockPos center) {
+		public void render(MatrixStack matrices, VertexConsumer vertexConsumer, Collection<Face> neighbors, BlockPos offset) {
+			matrices.push();
+
+			if(this.side == Direction.UP) {
+				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() + center - 0.5D / 16.0D, this.pos.getY() + 1.01D, this.pos.getZ() + 11.5D / 16.0D);
+				matrices.multiply(new Quaternion(new Vector3f(1.0F, 0.0F, 0.0F), 90.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			} else if(this.side == Direction.DOWN) {
+				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() + center - 0.5D / 16.0D, this.pos.getY() - 0.01D, this.pos.getZ() + 4.5D / 16.0D);
+				matrices.multiply(new Quaternion(new Vector3f(1.0F, 0.0F, 0.0F), -90.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			} else if(this.side == Direction.NORTH) {
+				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() + center - 0.5D / 16.0D, this.pos.getY() + 11.5D / 16.0D, this.pos.getZ() - 0.01D);
+				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 0.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			} else if(this.side == Direction.SOUTH) {
+				double center = (8.0D - MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() + center + 0.5D / 16.0D, this.pos.getY() + 11.5D / 16.0D, this.pos.getZ() + 1.01D);
+				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 180.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			} else if(this.side == Direction.WEST) {
+				double center = (8.0D - MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() - 0.01D, this.pos.getY() + 11.5D / 16.0D, this.pos.getZ() + center + 0.5D / 16.0D);
+				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 90.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			} else if(this.side == Direction.EAST) {
+				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
+				matrices.translate(this.pos.getX() + 1.01D, this.pos.getY() + 11.5D / 16.0D, this.pos.getZ() + center - 0.5D / 16.0D);
+				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), -90.0F, true));
+				matrices.scale(-1.0F, -1.0F, 1.0F);
+			}
+
+			matrices.scale(0.0625F, 0.0625F, 0.0625F);
+			MinecraftClient.getInstance().textRenderer.draw(matrices, new LiteralText(String.valueOf(this.weight)), 0, 0, this.color.getRBG());
+			matrices.pop();
+
 			if(this.side == Direction.DOWN) {
-				if(!neighbors.contains(new Face(this.pos.north(), Direction.DOWN, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 1, 0, 0, center);
+				if(!neighbors.contains(new Face(this.pos.north(), Direction.DOWN, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 1, 0, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.south(), Direction.DOWN, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 1, 1, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.south(), Direction.DOWN, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 1, 1, 0, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.east(), Direction.DOWN, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.east(), Direction.DOWN, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 0, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.west(), Direction.DOWN, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.west(), Direction.DOWN, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 0, 1, offset);
 				}
 			} else if(this.side == Direction.UP) {
-				if(!neighbors.contains(new Face(this.pos.north(), Direction.UP, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 0, 1, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.north(), Direction.UP, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 0, 1, 1, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.south(), Direction.UP, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 1, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.south(), Direction.UP, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 1, 1, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.east(), Direction.UP, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 1, 0, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.east(), Direction.UP, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 1, 0, 1, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.west(), Direction.UP, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 0, 0, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.west(), Direction.UP, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 0, 0, 1, 1, offset);
 				}
 			} else if(this.side == Direction.NORTH) {
-				if(!neighbors.contains(new Face(this.pos.down(), Direction.NORTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 1, 0, 0, center);
+				if(!neighbors.contains(new Face(this.pos.down(), Direction.NORTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 1, 0, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.up(), Direction.NORTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 0, 1, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.up(), Direction.NORTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 0, 1, 1, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.east(), Direction.NORTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.east(), Direction.NORTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 1, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.west(), Direction.NORTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.west(), Direction.NORTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 1, 0, offset);
 				}
 			} else if(this.side == Direction.SOUTH) {
-				if(!neighbors.contains(new Face(this.pos.down(), Direction.SOUTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 1, 1, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.down(), Direction.SOUTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 1, 1, 0, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.up(), Direction.SOUTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 1, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.up(), Direction.SOUTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 1, 1, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.east(), Direction.SOUTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 1, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.east(), Direction.SOUTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 1, 1, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.west(), Direction.SOUTH, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 1, 0, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.west(), Direction.SOUTH, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 1, 0, 1, 1, offset);
 				}
 			} else if(this.side == Direction.WEST) {
-				if(!neighbors.contains(new Face(this.pos.down(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.down(), Direction.WEST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 0, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.up(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 1, 0, 0, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.up(), Direction.WEST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 1, 0, 0, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.north(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.north(), Direction.WEST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 0, 0, 1, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.south(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 0, 0, 1, 0, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.south(), Direction.WEST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 0, 0, 1, 0, 1, 1, offset);
 				}
 			} else if(this.side == Direction.EAST) {
-				if(!neighbors.contains(new Face(this.pos.down(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 0, 1, center);
+				if(!neighbors.contains(new Face(this.pos.down(), Direction.EAST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 0, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.up(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 1, 0, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.up(), Direction.EAST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 1, 0, 1, 1, 1, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.north(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 1, 0, center);
+				if(!neighbors.contains(new Face(this.pos.north(), Direction.EAST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 0, 1, 1, 0, offset);
 				}
-				if(!neighbors.contains(new Face(this.pos.south(), Direction.WEST, this.color))) {
-					this.drawLine(matrices, vertexConsumer, 1, 0, 1, 1, 1, 1, center);
+				if(!neighbors.contains(new Face(this.pos.south(), Direction.EAST, this.weight))) {
+					drawLine(matrices, vertexConsumer, 1, 0, 1, 1, 1, 1, offset);
 				}
 			}
 		}
 
 		public void drawLine(MatrixStack matrices, VertexConsumer vertexConsumer,
 		                     double x1, double y1, double z1,
-		                     double x2, double y2, double z2, BlockPos center) {
+		                     double x2, double y2, double z2, BlockPos offset) {
 			Matrix4f matrix = matrices.peek().getModel();
-			BlockPos p = this.pos.subtract(center);
+			BlockPos p = this.pos.add(offset);
+
 			vertexConsumer.vertex(matrix, p.getX() + (float)x1, p.getY() + (float)y1, p.getZ() + (float)z1)
 					.color(this.color.getFRed(), this.color.getFGreen(), this.color.getFBlue(), 1.0F).next();
 			vertexConsumer.vertex(matrix, p.getX() + (float)x2, p.getY() + (float)y2, p.getZ() + (float)z2)
@@ -139,12 +188,12 @@ public class SpawnerRenderer {
 			if(this == other)return true;
 			if(!(other instanceof Face))return false;
 			Face face = (Face)other;
-			return this.pos.equals(face.pos) && this.side == face.side && this.color.equals(face.color);
+			return this.pos.equals(face.pos) && this.side == face.side && this.weight == face.weight;
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(this.pos, this.side, this.color);
+			return Objects.hash(this.pos, this.side, this.weight);
 		}
 	}
 

@@ -23,6 +23,7 @@ public class ModRegistries {
 		ModBlocks.register();
 		ModBlocks.Entities.register();
 		ModMenus.register();
+		ModNetwork.register();
 
 		if(Platform.getEnvironment() == Env.CLIENT) {
 			ModScreens.register();

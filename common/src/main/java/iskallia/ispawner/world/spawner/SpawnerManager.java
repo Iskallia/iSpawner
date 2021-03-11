@@ -1,5 +1,6 @@
 package iskallia.ispawner.world.spawner;
 
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
@@ -36,12 +37,26 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 			return;
 		}
 
-		this.actions.add(action, weight);
+		if(weight > 0) {
+			this.actions.add(action, weight);
+		}
 	}
 
-	public void spawn(World world, Random random) {
+	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
+		WeightedList<ItemStack> pool = new WeightedList<>();
+
+		IntStream.range(0, entity.inventory.size())
+				.mapToObj(i -> entity.inventory.getStack(i))
+				.filter(stack -> !stack.isEmpty())
+				.forEach(stack -> pool.add(stack.copy(), stack.getCount()));
+
+
+		if(pool.isEmpty())return;
+
 		for(int i = 0; i < this.settings.attempts; i++) {
-			this.actions.getRandom(random).execute(world, ItemStack.EMPTY); //TODO
+			this.actions.getRandom(random)
+					.toAbsolute(entity.getCenterPos(), entity.getRotation())
+					.execute(world, pool.getRandom(random).copy());
 		}
 	}
 

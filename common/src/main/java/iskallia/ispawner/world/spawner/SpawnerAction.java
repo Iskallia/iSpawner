@@ -3,6 +3,7 @@ package iskallia.ispawner.world.spawner;
 import iskallia.ispawner.nbt.INBTSerializable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -25,6 +26,10 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 		this.side = side;
 		this.hitPos = hitPos;
 		this.hand = hand;
+	}
+
+	public SpawnerAction toAbsolute(BlockPos pos, BlockRotation rotation) {
+		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()), this.getHitPos(), this.getHand());
 	}
 
 	public BlockPos getPos() {

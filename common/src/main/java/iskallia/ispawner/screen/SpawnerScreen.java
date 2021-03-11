@@ -17,4 +17,9 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 		this.renderBackground(matrices);
 	}
 
+	@Override
+	public boolean isPauseScreen() {
+		return false;
+	}
+
 }

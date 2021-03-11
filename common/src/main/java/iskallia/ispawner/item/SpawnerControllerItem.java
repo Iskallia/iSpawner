@@ -2,25 +2,50 @@ package iskallia.ispawner.item;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.init.ModBlocks;
-import iskallia.ispawner.nbt.NBTConstants;
+import iskallia.ispawner.screen.SpawnerControllerScreen;
 import iskallia.ispawner.world.spawner.SpawnerAction;
+import iskallia.ispawner.world.spawner.SpawnerController;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.*;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.Optional;
+import net.minecraft.world.RaycastContext;
+import net.minecraft.world.World;
 
 public class SpawnerControllerItem extends Item {
 
 	public SpawnerControllerItem(Settings settings) {
 		super(settings);
+	}
+
+	@Override
+	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+		if(!world.isClient) {
+			ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
+			SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
+			BlockHitResult context = raycast(world, player, RaycastContext.FluidHandling.NONE);
+
+			if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
+				controller.getTarget().ifPresent(spawnerPos -> {
+					BlockEntity blockEntity = world.getBlockEntity(spawnerPos);
+					if(!(blockEntity instanceof SpawnerBlockEntity)) return;
+					SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
+					BlockRotation rotation = spawner.getReverseRotation();
+					BlockPos offset = pos.subtract(spawner.getCenterPos());
+					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation), rotation.rotate(context.getSide()), context.getPos(), Hand.MAIN_HAND), -1);
+					spawner.sendClientUpdates();
+				});
+			}
+		}
+
+		return false;
 	}
 
 	@Override
@@ -31,43 +56,52 @@ public class SpawnerControllerItem extends Item {
 			return ActionResult.SUCCESS;
 		}
 
+		SpawnerController controller = new SpawnerController(context.getStack().getOrCreateSubTag("Controller"));
+
 		if(state.getBlock() == ModBlocks.SPAWNER) {
-			setSpawnerTarget(context.getStack(), context.getBlockPos());
+			controller.setTarget(context.getBlockPos());
 
 			if(context.getPlayer() != null) {
 				context.getPlayer().sendMessage(new LiteralText("Bound to spawner.").formatted(Formatting.GREEN), true);
 			}
 		} else {
-			Optional<BlockPos> target = getSpawnerTarget(context.getStack());
-
-			target.ifPresent(spawnerPos -> {
-				BlockEntity blockEntity = context.getWorld().getBlockEntity(spawnerPos);
-				if(!(blockEntity instanceof SpawnerBlockEntity))return;
-
-				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
-				spawner.manager.addAction(new SpawnerAction(context.getBlockPos(), context.getSide(), context.getHitPos(), context.getHand()), 1);
-				spawner.sendClientUpdates();
-			});
+			if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
+				controller.getTarget().ifPresent(spawnerPos -> {
+					BlockEntity blockEntity = context.getWorld().getBlockEntity(spawnerPos);
+					if(!(blockEntity instanceof SpawnerBlockEntity)) return;
+					SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
+					BlockRotation rotation = spawner.getReverseRotation();
+					BlockPos offset = context.getBlockPos().subtract(spawner.getCenterPos());
+					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation), rotation.rotate(context.getSide()), context.getHitPos(), context.getHand()), 1);
+					spawner.sendClientUpdates();
+				});
+			}
 		}
 
 		return ActionResult.CONSUME;
 	}
 
-	public static void setSpawnerTarget(ItemStack stack, BlockPos pos) {
-		CompoundTag posTag = new CompoundTag();
-		posTag.putInt("X", pos.getX());
-		posTag.putInt("Y", pos.getY());
-		posTag.putInt("Z", pos.getZ());
-		stack.getOrCreateTag().put("SpawnerTarget", posTag);
-	}
+	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+		ItemStack stack = player.getStackInHand(hand);
+		SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
 
-	public static Optional<BlockPos> getSpawnerTarget(ItemStack stack) {
-		if(stack.getTag() == null || !stack.getTag().contains("SpawnerTarget", NBTConstants.COMPOUND)) {
-			return Optional.empty();
+		if(player.isSneaking()) {
+			if(world.isClient) {
+				MinecraftClient.getInstance().openScreen(new SpawnerControllerScreen(new LiteralText("Spawner Controller"), controller));
+			}
+		} else if(controller.getMode() == SpawnerController.Mode.SPAWN_REMOTE && !world.isClient) {
+			controller.getTarget().ifPresent(spawnerPos -> {
+				BlockEntity blockEntity = world.getBlockEntity(spawnerPos);
+				if(!(blockEntity instanceof SpawnerBlockEntity)) return;
+				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
+				spawner.manager.spawn(world, world.getRandom(), spawner);
+				player.sendMessage(new LiteralText("Spawned mobs.").formatted(Formatting.GREEN), true);
+			});
 		}
 
-		CompoundTag posTag = stack.getTag().getCompound("SpawnerTarget");
-		return Optional.of(new BlockPos(posTag.getInt("X"), posTag.getInt("Y"), posTag.getInt("Z")));
+
+		return TypedActionResult.success(stack);
 	}
 
 }

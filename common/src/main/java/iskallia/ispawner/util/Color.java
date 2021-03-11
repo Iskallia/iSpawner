@@ -40,6 +40,10 @@ public class Color {
 		return this.getBlue() / 255.0F;
 	}
 
+	public int getRBG() {
+		return this.getRed() << 16 | this.getGreen() << 8 | this.getBlue();
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if(this == other)return true;

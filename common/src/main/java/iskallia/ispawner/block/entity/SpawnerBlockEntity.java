@@ -1,5 +1,6 @@
 package iskallia.ispawner.block.entity;
 
+import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.nbt.NBTConstants;
@@ -16,8 +17,10 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, NamedScreenHandlerFactory, InventoryChangedListener {
 
@@ -50,7 +53,11 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public void tick() {
+		if(this.getWorld() == null)return;
 
+		if(this.getWorld().getTime() % 100 == 0) {
+			this.manager.spawn(this.getWorld(), this.getWorld().random, this);
+		}
 	}
 
 	@Override
@@ -68,8 +75,46 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		return new SpawnerScreenHandler(syncId, inv, this.inventory);
 	}
 
+	public BlockPos getOffset() {
+		return new BlockPos(0, 0, 0);
+	}
+
 	public BlockPos getCenterPos() {
-		return this.getPos();
+		return this.getPos().add(this.getOffset());
+	}
+
+	public BlockRotation getRotation() {
+		if(this.getWorld() != null) {
+			Direction facing = this.getWorld().getBlockState(this.getPos()).get(SpawnerBlock.FACING);
+
+			if(facing == Direction.NORTH) {
+				return BlockRotation.NONE;
+			} else if(facing == Direction.SOUTH) {
+				return BlockRotation.CLOCKWISE_180;
+			} else if(facing == Direction.WEST) {
+				return BlockRotation.CLOCKWISE_90;
+			} else if(facing == Direction.EAST) {
+				return BlockRotation.COUNTERCLOCKWISE_90;
+			}
+		}
+
+		return null;
+	}
+
+	public BlockRotation getReverseRotation() {
+		BlockRotation rotation = this.getRotation();
+
+		if(rotation == BlockRotation.NONE) {
+			return BlockRotation.NONE;
+		} else if(rotation == BlockRotation.CLOCKWISE_90) {
+			return BlockRotation.COUNTERCLOCKWISE_90;
+		} else if(rotation == BlockRotation.CLOCKWISE_180) {
+			return BlockRotation.CLOCKWISE_180;
+		} else if(rotation == BlockRotation.COUNTERCLOCKWISE_90) {
+			return BlockRotation.CLOCKWISE_90;
+		}
+
+		return null;
 	}
 
 }

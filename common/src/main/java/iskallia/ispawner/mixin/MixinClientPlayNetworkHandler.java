@@ -27,7 +27,7 @@ public abstract class MixinClientPlayNetworkHandler {
 		BlockEntity blockEntity = this.world.getBlockEntity(packet.getPos());
 
 		if(blockEntity instanceof BaseBlockEntity) {
-			((BaseBlockEntity)blockEntity).read(state, packet.getCompoundTag(), BaseBlockEntity.UpdateType.PACKET);
+			((BaseBlockEntity)blockEntity).read(state, packet.getCompoundTag(), BaseBlockEntity.UpdateType.UPDATE_PACKET);
 			ci.cancel();
 		}
 	}
