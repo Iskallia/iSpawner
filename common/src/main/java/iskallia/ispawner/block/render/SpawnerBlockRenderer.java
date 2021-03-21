@@ -8,14 +8,22 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity> {
 
@@ -43,6 +51,24 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 
 		boolean rendered = tryRender(entity, matrices, vertexConsumers, player.getStackInHand(Hand.MAIN_HAND))
 				|| tryRender(entity, matrices, vertexConsumers, player.getStackInHand(Hand.OFF_HAND));
+
+		if(rendered) {
+			BlockPos pos = entity.getOffset();
+
+			WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
+					pos.getX(), pos.getY(), pos.getZ(),
+					pos.getX() + 1.0D, pos.getY() + 1.0D, pos.getZ() + 1.0D,
+					1.0F, 1.0F, 1.0F, 1.0F,
+					1.0F, 1.0F, 1.0F);
+
+			WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
+					0.0D, 0.0D, 0.0D,
+					1.0D, 1.0D, 1.0D,
+					1.0F, 1.0F, 1.0F, 1.0F,
+					1.0F, 1.0F, 1.0F);
+		}
+
+		this.renderEntity(entity, tickDelta, matrices, vertexConsumers, light, overlay);
 	}
 
 	public boolean tryRender(SpawnerBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack) {
@@ -62,6 +88,36 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 	@Override
 	public boolean rendersOutsideBoundingBox(SpawnerBlockEntity blockEntity) {
 		return true;
+	}
+
+	public void renderEntity(SpawnerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		ItemStack stack = this.getRenderedItem(entity);
+
+		if(stack != null) {
+			matrices.translate(0.5D, 0.0D, 0.5D);
+			long ticks = entity.getWorld().getTime();
+			double prev = (ticks * 9.0D) % 360.0D;
+			double next = (prev + 9.0D) % 360.0D;
+
+			matrices.scale(1.5F, 1.5F, 1.5F);
+			matrices.translate(0.0D, 0.4D, 0.0D);
+			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion((float)MathHelper.lerp(tickDelta, prev, next) - 10.0F));
+			MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, light, overlay, matrices, vertexConsumers);
+		}
+
+		matrices.pop();
+	}
+
+	private ItemStack getRenderedItem(SpawnerBlockEntity entity) {
+		List<ItemStack> items = IntStream.range(0, entity.inventory.size())
+				.mapToObj(i -> entity.inventory.getStack(i))
+				.filter(stack -> !stack.isEmpty())
+				.collect(Collectors.toList());
+
+		if(items.size() == 0)return null;
+		int i = (int)((entity.getWorld().getTime() / 40) % items.size());
+		return items.get(i).copy();
 	}
 
 	public static Color getColorFor(int weight) {

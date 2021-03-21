@@ -8,9 +8,7 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
-import java.io.IOException;
-
-public class UpdateControllerC2SPacket extends ModPacket<ServerPlayNetworkHandler> {
+public class UpdateControllerC2SPacket implements ModPacket<ServerPlayNetworkHandler> {
 
 	protected BlockPos target;
 	protected SpawnerController.Mode mode;
@@ -33,13 +31,13 @@ public class UpdateControllerC2SPacket extends ModPacket<ServerPlayNetworkHandle
 	}
 
 	@Override
-	public void read(PacketByteBuf buf) throws IOException {
+	public void read(PacketByteBuf buf) {
 		this.target = buf.readBoolean() ? BlockPos.fromLong(buf.readLong()) : null;
 		this.mode = SpawnerController.Mode.values()[buf.readVarInt()];
 	}
 
 	@Override
-	public void write(PacketByteBuf buf) throws IOException {
+	public void write(PacketByteBuf buf) {
 		buf.writeBoolean(this.target != null);
 		if(this.target != null)buf.writeLong(this.target.asLong());
 		buf.writeVarInt(this.mode.ordinal());

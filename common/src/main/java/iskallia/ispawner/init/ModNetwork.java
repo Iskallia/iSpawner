@@ -3,6 +3,8 @@ package iskallia.ispawner.init;
 import iskallia.ispawner.ISpawner;
 import iskallia.ispawner.net.packet.ModPacket;
 import iskallia.ispawner.net.packet.UpdateControllerC2SPacket;
+import iskallia.ispawner.net.packet.UpdateSettingsC2SPacket;
+import iskallia.ispawner.net.packet.UpdateSettingsS2CPacket;
 import me.shedaniel.architectury.networking.NetworkChannel;
 import me.shedaniel.architectury.networking.NetworkManager;
 import net.minecraft.client.MinecraftClient;
@@ -21,6 +23,8 @@ public class ModNetwork extends ModRegistries {
 
 	public static void register() {
 		register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
+		register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new, SERVER_PLAY);
+		register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, CLIENT_PLAY);
 	}
 
 	public static final Function<NetworkManager.PacketContext, ClientPlayNetworkHandler> CLIENT_PLAY = context -> MinecraftClient.getInstance().getNetworkHandler();

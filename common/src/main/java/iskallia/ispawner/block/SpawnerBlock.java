@@ -8,9 +8,12 @@ import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
@@ -22,13 +25,16 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
+import java.util.Random;
+
 public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
-	public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
+	public static final DirectionProperty FACING = Properties.FACING;
+	public static final BooleanProperty POWERED = Properties.POWERED;
 
 	public SpawnerBlock(Settings settings) {
 		super(settings);
-		this.setDefaultState(this.getDefaultState().with(FACING, Direction.NORTH));
+		this.setDefaultState(this.getDefaultState().with(FACING, Direction.NORTH).with(POWERED, false));
 	}
 
 	@Override
@@ -38,7 +44,7 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(FACING);
+		builder.add(FACING, POWERED);
 	}
 
 	@Override
@@ -84,6 +90,37 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 	public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		return blockEntity instanceof SpawnerBlockEntity ? ((SpawnerBlockEntity)blockEntity).inventory : null;
+	}
+
+	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
+		boolean powered = world.isReceivingRedstonePower(pos);
+
+		if(powered != state.get(POWERED)) {
+			if(powered)this.onPowered(world, pos);
+			world.setBlockState(pos, state.with(POWERED, powered), 3);
+		}
+	}
+
+	public void onPowered(World world, BlockPos pos) {
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+
+		if(blockEntity instanceof SpawnerBlockEntity) {
+			SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
+			spawner.manager.spawn(world, world.random, spawner);
+		}
+	}
+
+	@Override
+	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+		for(int i = 0; i < 5; i++) {
+			double x = (double)pos.getX() + world.random.nextDouble();
+			double y = (double)pos.getY() + world.random.nextDouble();
+			double z = (double)pos.getZ() + world.random.nextDouble();
+			world.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0D, 0.0D, 0.0D);
+			world.addParticle(ParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D);
+		}
+
+		super.randomDisplayTick(state, world, pos, random);
 	}
 
 }

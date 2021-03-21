@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -27,16 +28,22 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	public SimpleInventory inventory = new SimpleInventory(27);
 	public SpawnerManager manager = new SpawnerManager();
 	public SpawnerRenderer renderer = new SpawnerRenderer();
+	public BlockPos offset = BlockPos.ORIGIN;
 
 	public SpawnerBlockEntity() {
 		super(ModBlocks.Entities.SPAWNER);
 		this.inventory.addListener(this);
 	}
 
+	public SimpleInventory getInventory() {
+		return this.inventory;
+	}
+
 	@Override
 	public CompoundTag write(CompoundTag tag, UpdateType type) {
 		tag.put("Inventory", this.inventory.writeToNBT());
 		tag.put("Manager", this.manager.writeToNBT());
+		tag.put("Offset", NbtHelper.fromBlockPos(this.offset));
 		return tag;
 	}
 
@@ -49,20 +56,19 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		if(tag.contains("Manager", NBTConstants.COMPOUND)) {
 			this.manager.readFromNBT(tag.getCompound("Manager"));
 		}
+
+		this.offset = NbtHelper.toBlockPos(tag.getCompound("Offset"));
 	}
 
 	@Override
 	public void tick() {
 		if(this.getWorld() == null)return;
-
-		if(this.getWorld().getTime() % 100 == 0) {
-			this.manager.spawn(this.getWorld(), this.getWorld().random, this);
-		}
+		this.manager.tick(this.getWorld(), this.getWorld().random, this);
 	}
 
 	@Override
 	public void onInventoryChanged(Inventory sender) {
-		this.markDirty();
+		this.sendClientUpdates();
 	}
 
 	@Override
@@ -72,11 +78,15 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		return new SpawnerScreenHandler(syncId, inv, this.inventory);
+		return new SpawnerScreenHandler(syncId, inv, this);
 	}
 
 	public BlockPos getOffset() {
-		return new BlockPos(0, 0, 0);
+		return this.offset.rotate(this.getRotation());
+	}
+
+	public void setOffset(BlockPos offset) {
+		this.offset = offset;
 	}
 
 	public BlockPos getCenterPos() {
@@ -92,9 +102,9 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 			} else if(facing == Direction.SOUTH) {
 				return BlockRotation.CLOCKWISE_180;
 			} else if(facing == Direction.WEST) {
-				return BlockRotation.CLOCKWISE_90;
-			} else if(facing == Direction.EAST) {
 				return BlockRotation.COUNTERCLOCKWISE_90;
+			} else if(facing == Direction.EAST) {
+				return BlockRotation.CLOCKWISE_90;
 			}
 		}
 

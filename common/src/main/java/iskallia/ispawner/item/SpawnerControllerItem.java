@@ -58,24 +58,30 @@ public class SpawnerControllerItem extends Item {
 
 		SpawnerController controller = new SpawnerController(context.getStack().getOrCreateSubTag("Controller"));
 
-		if(state.getBlock() == ModBlocks.SPAWNER) {
+		if(state.getBlock() == ModBlocks.SPAWNER && !context.getBlockPos().equals(controller.getTarget().orElse(null))) {
 			controller.setTarget(context.getBlockPos());
 
 			if(context.getPlayer() != null) {
 				context.getPlayer().sendMessage(new LiteralText("Bound to spawner.").formatted(Formatting.GREEN), true);
 			}
 		} else {
-			if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
-				controller.getTarget().ifPresent(spawnerPos -> {
-					BlockEntity blockEntity = context.getWorld().getBlockEntity(spawnerPos);
-					if(!(blockEntity instanceof SpawnerBlockEntity)) return;
-					SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
+			controller.getTarget().ifPresent(spawnerPos -> {
+				BlockEntity blockEntity = context.getWorld().getBlockEntity(spawnerPos);
+				if(!(blockEntity instanceof SpawnerBlockEntity))return;
+				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
+
+				if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = context.getBlockPos().subtract(spawner.getCenterPos());
 					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation), rotation.rotate(context.getSide()), context.getHitPos(), context.getHand()), 1);
 					spawner.sendClientUpdates();
-				});
-			}
+				} else if(controller.getMode() == SpawnerController.Mode.RELOCATOR) {
+					BlockRotation rotation = spawner.getReverseRotation();
+					BlockPos offset = context.getBlockPos().subtract(spawner.getPos());
+					spawner.setOffset(offset.rotate(rotation));
+					spawner.sendClientUpdates();
+				}
+			});
 		}
 
 		return ActionResult.CONSUME;
