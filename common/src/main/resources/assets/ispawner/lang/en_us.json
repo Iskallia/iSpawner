@@ -1,3 +1,5 @@
 {
-  "block.ispawner.spawner": "Spawner"
+  "block.ispawner.spawner": "Spawner",
+  "item.ispawner.spawner_controller": "Spawner Controller",
+  "container.spawner": "Spawner"
 }

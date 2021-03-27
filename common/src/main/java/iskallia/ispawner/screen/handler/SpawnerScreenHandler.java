@@ -40,18 +40,18 @@ public class SpawnerScreenHandler extends ScreenHandler {
 
 		for(n = 0; n < 3; ++n) {
 			for(m = 0; m < 9; ++m) {
-				this.addSlot(new Slot(this.spawnerInventory, m + n * 9, 8 + m * 18, 18 + n * 18));
+				this.addSlot(new Slot(this.spawnerInventory, m + n * 9, 8 + m * 18 + 110, 18 + n * 18));
 			}
 		}
 
 		for(n = 0; n < 3; ++n) {
 			for(m = 0; m < 9; ++m) {
-				this.addSlot(new Slot(playerInventory, m + n * 9 + 9, 8 + m * 18, 103 + n * 18 - 18));
+				this.addSlot(new Slot(playerInventory, m + n * 9 + 9, 8 + m * 18 + 110, 103 + n * 18 - 18));
 			}
 		}
 
 		for(n = 0; n < 9; ++n) {
-			this.addSlot(new Slot(playerInventory, n, 8 + n * 18, 161 - 18));
+			this.addSlot(new Slot(playerInventory, n, 8 + n * 18 + 110, 161 - 18));
 		}
 	}
 

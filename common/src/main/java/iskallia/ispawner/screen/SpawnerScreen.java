@@ -1,5 +1,6 @@
 package iskallia.ispawner.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import iskallia.ispawner.init.ModNetwork;
 import iskallia.ispawner.net.packet.UpdateSettingsC2SPacket;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
@@ -14,6 +15,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.HashMap;
@@ -23,6 +25,8 @@ import java.util.regex.Pattern;
 
 public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
+	private static final Identifier TEXTURE = new Identifier("textures/gui/container/generic_54.png");
+
 	protected SpawnerSettings settings;
 	private Slider attemptsSlider;
 	private TextFieldWidget spawnDelayTextField;
@@ -31,6 +35,10 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 	public SpawnerScreen(SpawnerScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
+
+		this.passEvents = false;
+		this.backgroundHeight = 114 + 3 * 18;
+		this.playerInventoryTitleY = this.backgroundHeight - 94;
 	}
 
 	public SpawnerSettings getSettings() {
@@ -38,14 +46,27 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 	}
 
 	@Override
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		this.renderBackground(matrices);
+		super.render(matrices, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+	}
+
+	@Override
+	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+		this.textRenderer.draw(matrices, this.title, (float)this.titleX + 110, (float)this.titleY, 4210752);
+		this.textRenderer.draw(matrices, this.playerInventory.getDisplayName(), (float)this.playerInventoryTitleX + 110, (float)this.playerInventoryTitleY, 4210752);
+	}
+
+	@Override
 	protected void init() {
 		super.init();
 
-		this.attemptsSlider = this.addButton(new Slider(0, 0, 160, 20, LiteralText.EMPTY,
+		this.attemptsSlider = this.addButton(new Slider(40, 24, 160, 20, LiteralText.EMPTY,
 				0.0D, "Attempts: ", 0.0D, 32.0D, i -> this.settings.setAttempts(i)));
 
 		this.spawnDelayTextField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,
-				0, 25, 160, 20, LiteralText.EMPTY);
+				40, 24 + 25, 160, 20, LiteralText.EMPTY);
 
 		this.spawnDelayTextField.setChangedListener(text -> {
 			if(SpawnerScreen.this.settings != null && !text.isEmpty()) {
@@ -60,7 +81,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 		this.addButton(this.spawnDelayTextField);
 
-		this.modeButton = this.addButton(new ButtonWidget(0, 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
+		this.modeButton = this.addButton(new ButtonWidget(40, 24 + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
 				button -> {
 					if(SpawnerScreen.this.settings != null) {
 						SpawnerSettings.Mode[] modes = SpawnerSettings.Mode.values();
@@ -81,7 +102,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 			String prefix = String.join(" ", parts);
 
-			Slider spawnField = this.addButton(new Slider(0, 80 + i * 20, 160, 20, LiteralText.EMPTY,
+			Slider spawnField = this.addButton(new Slider(40, 24 + 80 + i * 20, 160, 20, LiteralText.EMPTY,
 					0.0D, prefix + " Cap: ", 0.0D, 32.0D, j -> {
 				this.settings.getCapRestrictions().get(spawnGroup).limit = j;
 			}));
@@ -115,7 +136,12 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 	@Override
 	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		this.renderBackground(matrices);
+		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		this.client.getTextureManager().bindTexture(TEXTURE);
+		int i = (this.width - this.backgroundWidth) / 2;
+		int j = (this.height - this.backgroundHeight) / 2;
+		this.drawTexture(matrices, i + 110, j, 0, 0, this.backgroundWidth, 3 * 18 + 17);
+		this.drawTexture(matrices, i + 110, j + 3 * 18 + 17, 0, 126, this.backgroundWidth, 96);
 	}
 
 	@Override

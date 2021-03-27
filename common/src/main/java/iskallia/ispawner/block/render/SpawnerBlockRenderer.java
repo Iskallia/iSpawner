@@ -95,13 +95,12 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 		ItemStack stack = this.getRenderedItem(entity);
 
 		if(stack != null) {
-			matrices.translate(0.5D, 0.0D, 0.5D);
+			matrices.translate(0.5D, 0.35D, 0.5D);
 			long ticks = entity.getWorld().getTime();
 			double prev = (ticks * 9.0D) % 360.0D;
 			double next = (prev + 9.0D) % 360.0D;
 
 			matrices.scale(1.5F, 1.5F, 1.5F);
-			matrices.translate(0.0D, 0.4D, 0.0D);
 			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion((float)MathHelper.lerp(tickDelta, prev, next) - 10.0F));
 			MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, light, overlay, matrices, vertexConsumers);
 		}
