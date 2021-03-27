@@ -10,7 +10,7 @@ public class ISpawnerForge {
 
     public ISpawnerForge() {
         // Submit our event bus to let architectury register our content on the right time
-        EventBuses.registerModEventBus(iskallia.ispawner.ISpawner.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
+        EventBuses.registerModEventBus(ISpawner.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
         ISpawner.init();
     }
 

@@ -127,4 +127,9 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		return null;
 	}
 
+	@Override
+	public double getSquaredRenderDistance() {
+		return 1024.0D;
+	}
+
 }

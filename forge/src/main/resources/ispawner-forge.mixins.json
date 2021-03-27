@@ -1,15 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "iskallia.ispawner.mixin",
+  "package": "iskallia.ispawner.forge.mixin",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "ispawner.refmap.json",
+  "refmap": "ispawner-forge.refmap.json",
   "mixins": [
   ],
   "client": [
-    "MixinBlockEntityRenderDispatcher",
-    "MixinClientPlayNetworkHandler",
-    "MixinRenderLayers"
+    "MixinRenderLayer",
+    "MixinSpawnerBlockEntity"
   ],
   "server": [
   ],

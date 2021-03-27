@@ -12,6 +12,7 @@ architectury {
 }
 
 loom {
+    mixinConfigs = ["ispawner.mixins.json", "ispawner-forge.mixins.json"]
     useFabricMixin = true
 }
 

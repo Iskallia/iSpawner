@@ -1,6 +1,5 @@
-package iskallia.ispawner.mixin;
+package iskallia.ispawner.forge.mixin;
 
-import iskallia.ispawner.init.ModRenderers;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -14,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 @Mixin(RenderLayers.class)
-public class MixinRenderLayers {
+public class MixinRenderLayer {
 
-	@Shadow @Final private static Map<Block, RenderLayer> BLOCKS;
+	@Shadow @Final @Deprecated private static Map<Block, RenderLayer> BLOCKS;
 
-	@Inject(method = "setFancyGraphicsOrBetter", at = @At("TAIL"))
+	@Inject(method = "setFancyGraphicsOrBetter", at = @At("RETURN"))
 	private static void setFancyGraphicsOrBetter(boolean fancyGraphicsOrBetter, CallbackInfo ci) {
-		ModRenderers.RenderLayers.register(BLOCKS, fancyGraphicsOrBetter);
+		BLOCKS.forEach(RenderLayers::setRenderLayer);
 	}
 
 }
