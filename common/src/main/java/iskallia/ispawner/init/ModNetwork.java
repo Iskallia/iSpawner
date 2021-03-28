@@ -24,11 +24,11 @@ public class ModNetwork extends ModRegistries {
 	public static final NetworkChannel CHANNEL = NetworkChannel.create(ISpawner.id("network"));
 
 	public static void register() {
+		Server.register();
+
 		if(Platform.getEnvironment() == Env.CLIENT) {
 			Client.register();
 		}
-
-		Server.register();
 	}
 
 	public static class Client {
