@@ -5,6 +5,8 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.screen.SpawnerControllerScreen;
 import iskallia.ispawner.world.spawner.SpawnerAction;
 import iskallia.ispawner.world.spawner.SpawnerController;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -94,7 +96,7 @@ public class SpawnerControllerItem extends Item {
 
 		if(player.isSneaking()) {
 			if(world.isClient) {
-				MinecraftClient.getInstance().openScreen(new SpawnerControllerScreen(new LiteralText("Spawner Controller"), controller));
+				this.openScreen(controller);
 			}
 		} else if(controller.getMode() == SpawnerController.Mode.SPAWN_REMOTE && !world.isClient) {
 			controller.getTarget().ifPresent(spawnerPos -> {
@@ -108,6 +110,11 @@ public class SpawnerControllerItem extends Item {
 
 
 		return TypedActionResult.success(stack);
+	}
+
+	@Environment(EnvType.CLIENT)
+	public void openScreen(SpawnerController controller) {
+		MinecraftClient.getInstance().openScreen(new SpawnerControllerScreen(new LiteralText("Spawner Controller"), controller));
 	}
 
 }

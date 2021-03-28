@@ -7,6 +7,8 @@ import iskallia.ispawner.net.packet.UpdateSettingsC2SPacket;
 import iskallia.ispawner.net.packet.UpdateSettingsS2CPacket;
 import me.shedaniel.architectury.networking.NetworkChannel;
 import me.shedaniel.architectury.networking.NetworkManager;
+import me.shedaniel.architectury.platform.Platform;
+import me.shedaniel.architectury.utils.Env;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.listener.PacketListener;
@@ -22,13 +24,32 @@ public class ModNetwork extends ModRegistries {
 	public static final NetworkChannel CHANNEL = NetworkChannel.create(ISpawner.id("network"));
 
 	public static void register() {
-		register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
-		register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new, SERVER_PLAY);
-		register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, CLIENT_PLAY);
+		if(Platform.getEnvironment() == Env.CLIENT) {
+			Client.register();
+		}
+
+		Server.register();
 	}
 
-	public static final Function<NetworkManager.PacketContext, ClientPlayNetworkHandler> CLIENT_PLAY = context -> MinecraftClient.getInstance().getNetworkHandler();
-	public static final Function<NetworkManager.PacketContext, ServerPlayNetworkHandler> SERVER_PLAY = context -> ((ServerPlayerEntity)context.getPlayer()).networkHandler;
+	public static class Client {
+		public static final Function<NetworkManager.PacketContext, ClientPlayNetworkHandler> CLIENT_PLAY = context -> MinecraftClient.getInstance().getNetworkHandler();
+
+		public static void register() {
+			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, CLIENT_PLAY);
+		}
+	}
+
+	public static class Server {
+		public static final Function<NetworkManager.PacketContext, ServerPlayNetworkHandler> SERVER_PLAY = context -> ((ServerPlayerEntity)context.getPlayer()).networkHandler;
+
+		public static void register() {
+			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, null);
+
+			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
+			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new, SERVER_PLAY);
+
+		}
+	}
 
 	public static <R extends PacketListener, T extends ModPacket<R>> void register(Class<T> type, Supplier<T> packetSupplier,
 	                                                                               Function<NetworkManager.PacketContext, R> contextMapper) {
@@ -41,7 +62,9 @@ public class ModNetwork extends ModRegistries {
 			catch(IOException e) { e.printStackTrace(); }
 			return packet;
 		}, (packet, contextSupplier) -> {
-			packet.apply(contextMapper.apply(contextSupplier.get()));
+			if(contextMapper != null) {
+				packet.apply(contextMapper.apply(contextSupplier.get()));
+			}
 		});
 	}
 
