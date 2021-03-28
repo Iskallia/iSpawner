@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "package": "iskallia.ispawner.mixin",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "ispawner.refmap.json",
   "mixins": [
   ],
   "client": [

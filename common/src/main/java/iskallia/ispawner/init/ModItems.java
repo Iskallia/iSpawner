@@ -11,7 +11,7 @@ public class ModItems extends ModRegistries {
 	public static Item SPAWNER_CONTROLLER;
 
 	public static void register() {
-		SPAWNER_CONTROLLER = register("spawner_controller", new SpawnerControllerItem(new Item.Settings().group(ItemGroup.SEARCH)));
+		SPAWNER_CONTROLLER = register("spawner_controller", new SpawnerControllerItem(new Item.Settings().maxCount(1).group(ItemGroup.SEARCH)));
 	}
 
 	public static <V extends Item> V register(Identifier id, V item) {

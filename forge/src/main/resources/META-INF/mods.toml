@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[35,)"
+loaderVersion = "[33,)"
 issueTrackerURL = "https://github.com/Iskallia/iSpawner/issues"
 license = "GPL-3.0"
 
@@ -16,7 +16,7 @@ Adds better spawner thingies.
 [[dependencies.ispawner]]
 modId = "forge"
 mandatory = true
-versionRange = "[35,)"
+versionRange = "[33,)"
 ordering = "NONE"
 side = "BOTH"
 

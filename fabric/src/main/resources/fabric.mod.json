@@ -20,7 +20,7 @@
     ]
   },
   "mixins": [
-    "ispawner.mixins.json"
+    "ispawner-common.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.4",
