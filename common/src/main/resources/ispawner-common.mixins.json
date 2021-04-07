@@ -4,6 +4,7 @@
   "package": "iskallia.ispawner.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinItemPlacementContext"
   ],
   "client": [
     "MixinBlockEntityRenderDispatcher",

@@ -18,20 +18,22 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 	protected Direction side;
 	protected Vec3d hitPos;
 	protected Hand hand;
+	protected Direction[] directions;
 
 	public SpawnerAction() {
 
 	}
 
-	public SpawnerAction(BlockPos pos, Direction side, Vec3d hitPos, Hand hand) {
+	public SpawnerAction(BlockPos pos, Direction side, Vec3d hitPos, Hand hand, Direction[] directions) {
 		this.pos = pos;
 		this.side = side;
 		this.hitPos = hitPos;
 		this.hand = hand;
+		this.directions = directions;
 	}
 
 	public SpawnerAction toAbsolute(BlockPos pos, BlockRotation rotation) {
-		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()), this.getHitPos(), this.getHand());
+		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()), this.getHitPos(), this.getHand(), this.getDirections());
 	}
 
 	public BlockPos getPos() {
@@ -48,6 +50,10 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
 	public Hand getHand() {
 		return this.hand;
+	}
+
+	public Direction[] getDirections() {
+		return this.directions;
 	}
 
 	public void execute(World world, ItemStack stack) {

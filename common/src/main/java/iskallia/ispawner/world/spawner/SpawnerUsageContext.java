@@ -18,8 +18,8 @@ public class SpawnerUsageContext extends ItemUsageContext {
 		this.action = action;
 	}
 
-	public SpawnerUsageContext(World world, ItemStack stack, BlockPos pos, Direction side, Vec3d hitPos, Hand hand) {
-		this(world, stack, new SpawnerAction(pos, side, hitPos, hand));
+	public SpawnerUsageContext(World world, ItemStack stack, BlockPos pos, Direction side, Vec3d hitPos, Hand hand, Direction[] directions) {
+		this(world, stack, new SpawnerAction(pos, side, hitPos, hand, directions));
 	}
 
 	public SpawnerAction getAction() {

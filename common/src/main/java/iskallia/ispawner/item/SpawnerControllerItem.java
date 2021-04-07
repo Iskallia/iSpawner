@@ -18,6 +18,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
@@ -41,7 +42,14 @@ public class SpawnerControllerItem extends Item {
 					SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = pos.subtract(spawner.getCenterPos());
-					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation), rotation.rotate(context.getSide()), context.getPos(), Hand.MAIN_HAND), -1);
+
+					spawner.manager.addAction(new SpawnerAction(
+							offset.rotate(rotation),
+							rotation.rotate(context.getSide()),
+							context.getPos(),
+							Hand.MAIN_HAND,
+							Direction.getEntityFacingOrder(player)), -1);
+
 					spawner.sendClientUpdates();
 				});
 			}
@@ -54,7 +62,7 @@ public class SpawnerControllerItem extends Item {
 	public ActionResult useOnBlock(ItemUsageContext context) {
 		BlockState state = context.getWorld().getBlockState(context.getBlockPos());
 
-		if(context.getWorld().isClient) {
+		if(context.getWorld().isClient || context.getPlayer() == null) {
 			return ActionResult.SUCCESS;
 		}
 
@@ -75,7 +83,13 @@ public class SpawnerControllerItem extends Item {
 				if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = context.getBlockPos().subtract(spawner.getCenterPos());
-					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation), rotation.rotate(context.getSide()), context.getHitPos(), context.getHand()), 1);
+
+					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation),
+							rotation.rotate(context.getSide()),
+							context.getHitPos(),
+							context.getHand(),
+							Direction.getEntityFacingOrder(context.getPlayer())), 1);
+
 					spawner.sendClientUpdates();
 				} else if(controller.getMode() == SpawnerController.Mode.RELOCATOR) {
 					BlockRotation rotation = spawner.getReverseRotation();
