@@ -12,6 +12,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
+
 public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
 	protected BlockPos pos;
@@ -75,6 +77,7 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 		nbt.putDouble("HitPosY", this.getHitPos().y);
 		nbt.putDouble("HitPosZ", this.getHitPos().z);
 		nbt.putInt("Hand", this.getHand().ordinal());
+		nbt.putIntArray("Directions", Arrays.stream(this.getDirections()).mapToInt(Enum::ordinal).toArray());
 		return nbt;
 	}
 
@@ -84,6 +87,7 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 		this.side = Direction.values()[nbt.getInt("Side")];
 		this.hitPos = new Vec3d(nbt.getDouble("HitPosX"), nbt.getDouble("HitPosY"), nbt.getDouble("HitPosZ"));
 		this.hand = Hand.values()[nbt.getInt("Hand")];
+		this.directions = Arrays.stream(nbt.getIntArray("Directions")).mapToObj(i -> Direction.values()[i]).toArray(Direction[]::new);
 	}
 
 	@Override
