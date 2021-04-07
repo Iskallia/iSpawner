@@ -3,6 +3,7 @@ package iskallia.ispawner.world.spawner;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -13,7 +14,7 @@ public class SpawnerUsageContext extends ItemUsageContext {
 	private final SpawnerAction action;
 
 	public SpawnerUsageContext(World world, ItemStack stack, SpawnerAction action) {
-		super(world, null, action.getHand(), stack, null);
+		super(world, null, action.getHand(), stack, new BlockHitResult(action.getHitPos(), action.getSide(), action.getPos(), false));
 		this.action = action;
 	}
 

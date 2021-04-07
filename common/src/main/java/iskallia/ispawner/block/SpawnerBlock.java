@@ -2,6 +2,7 @@ package iskallia.ispawner.block;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.init.ModItems;
+import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.PiglinBrain;
@@ -102,22 +103,31 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 	}
 
 	public void onPowered(World world, BlockPos pos) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
+		if(world.isClient)return;
 
-		if(blockEntity instanceof SpawnerBlockEntity) {
-			SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
-			spawner.manager.spawn(world, world.random, spawner);
-		}
+		world.getServer().execute(() -> {
+			BlockEntity blockEntity = world.getBlockEntity(pos);
+
+			if(blockEntity instanceof SpawnerBlockEntity) {
+				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
+				spawner.manager.spawn(world, world.random, spawner);
+			}
+		});
 	}
 
 	@Override
 	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-		for(int i = 0; i < 5; i++) {
-			double x = (double)pos.getX() + world.random.nextDouble();
-			double y = (double)pos.getY() + world.random.nextDouble();
-			double z = (double)pos.getZ() + world.random.nextDouble();
-			world.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0D, 0.0D, 0.0D);
-			world.addParticle(ParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D);
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+
+		if(state.get(POWERED) || blockEntity instanceof SpawnerBlockEntity
+				&& ((SpawnerBlockEntity)blockEntity).manager.settings.getMode() == SpawnerSettings.Mode.ALWAYS_ON) {
+			for(int i = 0; i < 5; i++) {
+				double x = (double)pos.getX() + world.random.nextDouble();
+				double y = (double)pos.getY() + world.random.nextDouble();
+				double z = (double)pos.getZ() + world.random.nextDouble();
+				world.addParticle(ParticleTypes.SMOKE, x, y, z, 0.0D, 0.0D, 0.0D);
+				world.addParticle(ParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D);
+			}
 		}
 
 		super.randomDisplayTick(state, world, pos, random);

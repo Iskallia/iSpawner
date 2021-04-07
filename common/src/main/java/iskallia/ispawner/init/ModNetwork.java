@@ -24,18 +24,29 @@ public class ModNetwork extends ModRegistries {
 	public static final NetworkChannel CHANNEL = NetworkChannel.create(ISpawner.id("network"));
 
 	public static void register() {
-		Server.register();
-
 		if(Platform.getEnvironment() == Env.CLIENT) {
 			Client.register();
+		} else {
+			Server.register();
 		}
+	}
+
+	public static Function<NetworkManager.PacketContext, ClientPlayNetworkHandler> getClient() {
+		return context -> MinecraftClient.getInstance().getNetworkHandler();
+	}
+
+	public static Function<NetworkManager.PacketContext, ServerPlayNetworkHandler> getServer() {
+		return context -> ((ServerPlayerEntity)context.getPlayer()).networkHandler;
 	}
 
 	public static class Client {
 		public static final Function<NetworkManager.PacketContext, ClientPlayNetworkHandler> CLIENT_PLAY = context -> MinecraftClient.getInstance().getNetworkHandler();
+		public static final Function<NetworkManager.PacketContext, ServerPlayNetworkHandler> SERVER_PLAY = context -> ((ServerPlayerEntity)context.getPlayer()).networkHandler;
 
 		public static void register() {
 			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, CLIENT_PLAY);
+			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
+			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new , SERVER_PLAY);
 		}
 	}
 
@@ -44,9 +55,8 @@ public class ModNetwork extends ModRegistries {
 
 		public static void register() {
 			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, null);
-
 			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
-			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new, SERVER_PLAY);
+			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new , SERVER_PLAY);
 
 		}
 	}

@@ -59,7 +59,7 @@ public class SpawnerScreenHandler extends ScreenHandler {
 	public void sendContentUpdates() {
 		super.sendContentUpdates();
 
-		if(!this.sentSettings) {
+		if(this.spawner != null && !this.spawner.getWorld().isClient && !this.sentSettings) {
 			ModNetwork.CHANNEL.sendToPlayer((ServerPlayerEntity)this.playerInventory.player,
 					new UpdateSettingsS2CPacket(this.getSpawner().manager.settings));
 			this.sentSettings = true;

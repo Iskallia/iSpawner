@@ -48,8 +48,10 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 	}
 
 	private void updateCache(SpawnerBlockEntity entity) {
-		if(actions.isEmpty()) {
-			this.boundingBox = BlockBox.empty();
+		if(this.actions.isEmpty()) {
+			this.boundingBox = BlockBox.create(
+					entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(),
+					entity.getPos().getX() + 1, entity.getPos().getY() + 1, entity.getPos().getZ() + 1);
 			return;
 		}
 
@@ -74,11 +76,13 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 		if(this.settings.getMode() == SpawnerSettings.Mode.ALWAYS_ON ||
 				(this.settings.getMode() == SpawnerSettings.Mode.REDSTONE_ON && power != 0)) {
-			this.spawn(world, random, entity); }
-
+			this.spawn(world, random, entity);
+		}
 	}
 
 	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
+		if(this.actions.isEmpty())return;
+
 		WeightedList<ItemStack> pool = new WeightedList<>();
 
 		IntStream.range(0, entity.inventory.size())

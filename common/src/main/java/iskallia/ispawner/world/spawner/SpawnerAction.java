@@ -1,7 +1,9 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.nbt.INBTSerializable;
+import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
@@ -50,6 +52,12 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
 	public void execute(World world, ItemStack stack) {
 		stack.useOnBlock(new SpawnerUsageContext(world, stack, this));
+
+		if(stack.getItem() instanceof ThrowablePotionItem) {
+			PotionEntity potion = new PotionEntity(world, this.getHitPos().getX(), this.getHitPos().getY(), this.getHitPos().getZ());
+			potion.setItem(stack);
+			world.spawnEntity(potion);
+		}
 	}
 
 	@Override
