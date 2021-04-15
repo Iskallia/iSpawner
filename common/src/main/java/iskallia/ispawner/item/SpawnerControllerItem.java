@@ -19,6 +19,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
@@ -83,10 +84,13 @@ public class SpawnerControllerItem extends Item {
 				if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = context.getBlockPos().subtract(spawner.getCenterPos());
+					Vec3d hitPosOffset = context.getHitPos().subtract(spawner.getCenterPos().getX(),
+							spawner.getCenterPos().getY(), spawner.getCenterPos().getZ());
 
-					spawner.manager.addAction(new SpawnerAction(offset.rotate(rotation),
+					spawner.manager.addAction(new SpawnerAction(
+							offset.rotate(rotation),
 							rotation.rotate(context.getSide()),
-							context.getHitPos(),
+							SpawnerAction.rotate(rotation, hitPosOffset),
 							context.getHand(),
 							Direction.getEntityFacingOrder(context.getPlayer())), 1);
 

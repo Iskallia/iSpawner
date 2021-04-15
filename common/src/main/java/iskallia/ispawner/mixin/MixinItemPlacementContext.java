@@ -37,7 +37,11 @@ public abstract class MixinItemPlacementContext extends ItemUsageContext {
 	@Inject(method = "<init>(Lnet/minecraft/item/ItemUsageContext;)V", at = @At("RETURN"))
 	public void init(ItemUsageContext context, CallbackInfo ci) {
 		if(context instanceof SpawnerUsageContext) {
-			this.directions = Arrays.stream(((SpawnerUsageContext)context).getAction().getDirections()).toArray(Direction[]::new);
+			Direction[] array = ((SpawnerUsageContext)context).getAction().getDirections();
+
+			if(array != null) {
+				this.directions = Arrays.stream(array).toArray(Direction[]::new);
+			}
 		}
 	}
 

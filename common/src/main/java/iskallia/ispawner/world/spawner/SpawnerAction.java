@@ -35,7 +35,23 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 	}
 
 	public SpawnerAction toAbsolute(BlockPos pos, BlockRotation rotation) {
-		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()), this.getHitPos(), this.getHand(), this.getDirections());
+		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()),
+				rotate(rotation, this.getHitPos()).add(pos.getX(), pos.getY(), pos.getZ()),
+				this.getHand(), this.getDirections());
+	}
+
+	public static Vec3d rotate(BlockRotation rotation, Vec3d position) {
+		switch(rotation) {
+			case NONE:
+			default:
+				return position;
+			case CLOCKWISE_90:
+				return new Vec3d(-position.getZ(), position.getY(), position.getX());
+			case CLOCKWISE_180:
+				return new Vec3d(-position.getX(), position.getY(), -position.getZ());
+			case COUNTERCLOCKWISE_90:
+				return new Vec3d(position.getZ(), position.getY(), -position.getX());
+		}
 	}
 
 	public BlockPos getPos() {
