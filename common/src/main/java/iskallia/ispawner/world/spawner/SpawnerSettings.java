@@ -18,6 +18,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 	protected int attempts = 4;
 	protected int spawnDelay = 500;
 	protected Mode mode = Mode.REDSTONE_PULSE;
+	protected int checkRadius = 16;
+	protected int playerRadius = 16;
 
 	protected Map<SpawnGroup, CapRestriction> capRestrictions = Util.make(Maps.newHashMap(), map -> {
 		map.put(SpawnGroup.MONSTER, new CapRestriction(SpawnGroup.MONSTER, 16));
@@ -44,6 +46,14 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		return this.capRestrictions;
 	}
 
+	public int getCheckRadius() {
+		return this.checkRadius;
+	}
+
+	public int getPlayerRadius() {
+		return this.playerRadius;
+	}
+
 	public void setAttempts(int attempts) {
 		this.attempts = attempts;
 	}
@@ -64,6 +74,14 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		this.capRestrictions = capRestrictions;
 	}
 
+	public void setCheckRadius(int checkRadius) {
+		this.checkRadius = checkRadius;
+	}
+
+	public void setPlayerRadius(int playerRadius) {
+		this.playerRadius = playerRadius;
+	}
+
 	@Override
 	public SpawnerSettings writeToBuf(PacketByteBuf buf) {
 		buf.writeVarInt(this.getAttempts());
@@ -74,6 +92,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 			buf.writeVarInt(this.getCapRestrictions().getOrDefault(spawnGroup, new CapRestriction(spawnGroup, -1)).limit);
 		}
 
+		buf.writeVarInt(this.getCheckRadius());
+		buf.writeVarInt(this.getPlayerRadius());
 		return this;
 	}
 
@@ -87,6 +107,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 			this.getCapRestrictions().put(spawnGroup, new CapRestriction(spawnGroup, buf.readVarInt()));
 		}
 
+		this.setCheckRadius(buf.readVarInt());
+		this.setPlayerRadius(buf.readVarInt());
 		return this;
 	}
 
@@ -98,12 +120,13 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		nbt.putInt("Mode", this.getMode().ordinal());
 
 		ListTag capList = new ListTag();
-
 		this.getCapRestrictions().values().forEach(cap -> {
 			capList.add(cap.writeToNBT());
 		});
-
 		nbt.put("CapRestrictions", capList);
+
+		nbt.putInt("CheckRadius", this.getCheckRadius());
+		nbt.putInt("PlayerRadius", this.getPlayerRadius());
 		return nbt;
 	}
 
@@ -120,6 +143,14 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 			capRestriction.readFromNBT(cap);
 			this.getCapRestrictions().put(capRestriction.spawnGroup, capRestriction);
 		});
+
+		if(nbt.contains("CheckRadius", NBTConstants.INT)) {
+			this.checkRadius = nbt.getInt("CheckRadius");
+		}
+
+		if(nbt.contains("PlayerRadius", NBTConstants.INT)) {
+			this.playerRadius = nbt.getInt("PlayerRadius");
+		}
 	}
 
 	public SpawnerSettings copy() {
@@ -129,6 +160,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		copy.setMode(this.getMode());
 		copy.setCapRestrictions(this.getCapRestrictions().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
 				o -> new CapRestriction(o.getValue().spawnGroup, o.getValue().limit))));
+		copy.setCheckRadius(this.getCheckRadius());
+		copy.setPlayerRadius(this.getCheckRadius());
 		return copy;
 	}
 

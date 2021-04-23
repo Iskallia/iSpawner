@@ -32,6 +32,8 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 	private TextFieldWidget spawnDelayTextField;
 	private ButtonWidget modeButton;
 	private Map<SpawnGroup, Slider> spawnGroupTextFields = new HashMap<>();
+	private Slider checkRangeSlider;
+	private Slider playerRangeSlider;
 
 	public SpawnerScreen(SpawnerScreenHandler handler, PlayerInventory inventory, Text title) {
 		super(handler, inventory, title);
@@ -62,11 +64,13 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 	protected void init() {
 		super.init();
 
-		this.attemptsSlider = this.addButton(new Slider(40, 24, 160, 20, LiteralText.EMPTY,
+		int offset = 2;
+
+		this.attemptsSlider = this.addButton(new Slider(40, offset, 160, 20, LiteralText.EMPTY,
 				0.0D, "Attempts: ", 0.0D, 32.0D, i -> this.settings.setAttempts(i)));
 
 		this.spawnDelayTextField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,
-				40, 24 + 25, 160, 20, LiteralText.EMPTY);
+				40, offset + 25, 160, 20, LiteralText.EMPTY);
 
 		this.spawnDelayTextField.setChangedListener(text -> {
 			if(SpawnerScreen.this.settings != null && !text.isEmpty()) {
@@ -81,7 +85,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 		this.addButton(this.spawnDelayTextField);
 
-		this.modeButton = this.addButton(new ButtonWidget(40, 24 + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
+		this.modeButton = this.addButton(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
 				button -> {
 					if(SpawnerScreen.this.settings != null) {
 						SpawnerSettings.Mode[] modes = SpawnerSettings.Mode.values();
@@ -102,13 +106,19 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 			String prefix = String.join(" ", parts);
 
-			Slider spawnField = this.addButton(new Slider(40, 24 + 80 + i * 20, 160, 20, LiteralText.EMPTY,
+			Slider spawnField = this.addButton(new Slider(40, offset + 80 + i * 20, 160, 20, LiteralText.EMPTY,
 					0.0D, prefix + " Cap: ", 0.0D, 32.0D, j -> {
 				this.settings.getCapRestrictions().get(spawnGroup).limit = j;
 			}));
 
 			this.spawnGroupTextFields.put(spawnGroup, spawnField);
 		}
+
+		this.checkRangeSlider = this.addButton(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 10, 160, 20, LiteralText.EMPTY,
+			0.0D, "Check Radius: ", 0.0D, 128.0D, i -> this.settings.setCheckRadius(i)));
+
+		this.playerRangeSlider = this.addButton(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 30, 160, 20, LiteralText.EMPTY,
+			0.0D, "Player Radius: ", 0.0D, 128.0D, i -> this.settings.setPlayerRadius(i)));
 	}
 
 	public void setSettings(SpawnerSettings settings) {
@@ -126,6 +136,9 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 				textField.setIntValue(settings.getCapRestrictions().get(spawnGroup).limit);
 			}
 		});
+
+		this.checkRangeSlider.setIntValue(settings.getCheckRadius());
+		this.playerRangeSlider.setIntValue(settings.getPlayerRadius());
 	}
 
 	private void sendSettings() {
@@ -147,11 +160,6 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 	@Override
 	public boolean isPauseScreen() {
 		return false;
-	}
-
-	public ButtonWidget addCenteredButton(int x, int y, int width, int height, String text, ButtonWidget.PressAction action) {
-		return this.addButton(new ButtonWidget(this.width / 2 - width / 2 + x, this.height / 2 - height / 2 + y,
-				width, height, new LiteralText(text), action));
 	}
 
 	public class Slider extends SliderWidget {
@@ -187,7 +195,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 		}
 
 		public void setIntValue(int attempts) {
-			this.value = (double)attempts / 32.0D;
+			this.value = attempts / (this.max - this.min) + this.min;
 			this.updateMessage();
 		}
 	}

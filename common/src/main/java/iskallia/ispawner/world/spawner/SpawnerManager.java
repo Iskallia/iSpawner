@@ -5,6 +5,7 @@ import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -13,15 +14,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 	public WeightedList<SpawnerAction> actions = new WeightedList<>();
 	public SpawnerSettings settings = new SpawnerSettings();
-	public BlockBox boundingBox;
 
 	public SpawnerManager() {
 
@@ -44,27 +46,6 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 		if(weight > 0) {
 			this.actions.add(action, weight);
-		}
-	}
-
-	private void updateCache(SpawnerBlockEntity entity) {
-		if(this.actions.isEmpty()) {
-			this.boundingBox = BlockBox.create(
-					entity.getPos().getX(), entity.getPos().getY(), entity.getPos().getZ(),
-					entity.getPos().getX() + 1, entity.getPos().getY() + 1, entity.getPos().getZ() + 1);
-			return;
-		}
-
-		List<BlockPos> positions = this.actions.stream()
-				.map(entry -> entry.value)
-				.map(action -> action.toAbsolute(entity.getCenterPos(), entity.getRotation()))
-				.map(SpawnerAction::getPos)
-				.collect(Collectors.toList());
-
-		this.boundingBox = new BlockBox(positions.get(0), positions.get(0));
-
-		for(int i = 1; i < this.actions.size(); i++) {
-			this.boundingBox.encompass(new BlockBox(positions.get(i), positions.get(i)));
 		}
 	}
 
@@ -92,11 +73,21 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 
 		if(pool.isEmpty())return;
+		BlockPos pos = entity.getPos();
 
-		this.updateCache(entity);
+		PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
+			this.settings.getPlayerRadius(), false);
+
+		if(closestPlayer == null)return;
+
 		Map<SpawnGroup, Integer> entityMap = new HashMap<>();
 
-		world.getOtherEntities(null, Box.from(this.boundingBox).expand(3.0D)).forEach(e -> {
+		BlockBox spawnerBox = BlockBox.create(
+			pos.getX(), pos.getY(), pos.getZ(),
+			pos.getX(), pos.getY(), pos.getZ()
+		);
+
+		world.getOtherEntities(null, Box.from(spawnerBox).expand(this.settings.getCheckRadius())).forEach(e -> {
 			SpawnGroup spawnGroup = e.getType().getSpawnGroup();
 			entityMap.put(spawnGroup, entityMap.getOrDefault(spawnGroup, 0) + 1);
 		});

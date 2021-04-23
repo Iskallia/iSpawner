@@ -36,6 +36,7 @@ public class UpdateSettingsC2SPacket implements ModPacket<ServerPlayNetworkHandl
 		if(listener.player.currentScreenHandler instanceof SpawnerScreenHandler) {
 			SpawnerScreenHandler screen = (SpawnerScreenHandler) listener.player.currentScreenHandler;
 			screen.getSpawner().manager.settings = this.getSettings();
+			screen.getSpawner().sendClientUpdates();
 		}
 	}
 

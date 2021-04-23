@@ -66,6 +66,14 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 					1.0D, 1.0D, 1.0D,
 					1.0F, 1.0F, 1.0F, 1.0F,
 					1.0F, 1.0F, 1.0F);
+
+			int r = entity.manager.settings.getCheckRadius();
+
+			WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
+				-r, -r, -r,
+				r + 1.0D, r + 1.0D, r + 1.0D,
+				1.0F, 1.0F, 1.0F, 1.0F,
+				1.0F, 1.0F, 1.0F);
 		}
 
 		this.renderEntity(entity, tickDelta, matrices, vertexConsumers, light, overlay);
