@@ -25,7 +25,7 @@ public class ModBlocks extends ModRegistries {
 
 	public static void register() {
 		SPAWNER = register("spawner", new SpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
-				.requiresTool().strength(5.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
+				.requiresTool().strength(50.0F, 1200.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 	}
 

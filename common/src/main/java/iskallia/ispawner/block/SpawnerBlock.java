@@ -68,7 +68,7 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 			return ActionResult.PASS;
 		}
 
-		if(world.isClient) {
+		if(world.isClient || !player.isCreative()) {
 			return ActionResult.SUCCESS;
 		}
 
