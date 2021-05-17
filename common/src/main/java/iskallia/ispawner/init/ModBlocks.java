@@ -3,6 +3,7 @@ package iskallia.ispawner.init;
 import com.mojang.datafixers.types.Type;
 import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -36,9 +37,11 @@ public class ModBlocks extends ModRegistries {
 
 	public static class Entities extends ModBlocks {
 		public static BlockEntityType<SpawnerBlockEntity> SPAWNER;
+		public static BlockEntityType<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
 		public static void register() {
-			SPAWNER = register("spawner", SpawnerBlockEntity::new, ModBlocks.SPAWNER, ModBlocks.SURVIVAL_SPAWNER);
+			SPAWNER = register("spawner", SpawnerBlockEntity::new, ModBlocks.SPAWNER);
+			SURVIVAL_SPAWNER = register("survival_spawner", SurvivalSpawnerBlockEntity::new, ModBlocks.SURVIVAL_SPAWNER);
 		}
 	}
 

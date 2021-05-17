@@ -9,6 +9,7 @@ import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerManager;
 import iskallia.ispawner.world.spawner.SpawnerRenderer;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -31,9 +32,13 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	public SpawnerRenderer renderer = new SpawnerRenderer();
 	public BlockPos offset = BlockPos.ORIGIN;
 
-	public SpawnerBlockEntity() {
-		super(ModBlocks.Entities.SPAWNER);
+	protected SpawnerBlockEntity(BlockEntityType<?> type) {
+		super(type);
 		this.inventory.addListener(this);
+	}
+
+	public SpawnerBlockEntity() {
+		this(ModBlocks.Entities.SPAWNER);
 	}
 
 	public SimpleInventory getInventory() {
