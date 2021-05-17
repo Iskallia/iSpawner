@@ -5,6 +5,7 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
+import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerManager;
 import iskallia.ispawner.world.spawner.SpawnerRenderer;
 import net.minecraft.block.BlockState;
@@ -78,7 +79,13 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		return new SpawnerScreenHandler(syncId, inv, this);
+		if(this.getCachedState().getBlock() == ModBlocks.SPAWNER) {
+			return new SpawnerScreenHandler(syncId, inv, this);
+		} else if(this.getCachedState().getBlock() == ModBlocks.SURVIVAL_SPAWNER) {
+			return new SurvivalSpawnerScreenHandler(syncId, inv, this);
+		}
+
+		return null;
 	}
 
 	public BlockPos getOffset() {
@@ -95,7 +102,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	public BlockRotation getRotation() {
 		if(this.getWorld() != null) {
-			Direction facing = this.getWorld().getBlockState(this.getPos()).get(SpawnerBlock.FACING);
+			Direction facing = this.getCachedState().get(SpawnerBlock.FACING);
 
 			if(facing == Direction.NORTH) {
 				return BlockRotation.NONE;

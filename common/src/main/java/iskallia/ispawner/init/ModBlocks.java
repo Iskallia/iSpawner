@@ -22,9 +22,14 @@ import java.util.function.Supplier;
 public class ModBlocks extends ModRegistries {
 
 	public static Block SPAWNER;
+	public static Block SURVIVAL_SPAWNER;
 
 	public static void register() {
 		SPAWNER = register("spawner", new SpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
+				.requiresTool().strength(100.0F, 1200.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
+				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
+
+		SURVIVAL_SPAWNER = register("survival_spawner", new SpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
 				.requiresTool().strength(50.0F, 1200.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 	}
@@ -33,7 +38,7 @@ public class ModBlocks extends ModRegistries {
 		public static BlockEntityType<SpawnerBlockEntity> SPAWNER;
 
 		public static void register() {
-			SPAWNER = register("spawner", SpawnerBlockEntity::new, ModBlocks.SPAWNER);
+			SPAWNER = register("spawner", SpawnerBlockEntity::new, ModBlocks.SPAWNER, ModBlocks.SURVIVAL_SPAWNER);
 		}
 	}
 
