@@ -33,6 +33,8 @@ public class ModRegistries {
 		ITEMS.register();
 		BLOCK_ENTITY_TYPES.register();
 		SCREEN_HANDLERS.register();
+
+		ModConfigs.register();
 	}
 
 	public static <T, V extends T> V register(DeferredRegister<T> registry, Identifier id, V value) {
