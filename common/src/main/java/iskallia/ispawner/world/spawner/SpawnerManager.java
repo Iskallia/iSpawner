@@ -67,7 +67,7 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 		WeightedList<Entry> pool = new WeightedList<>();
 
 		IntStream.range(0, entity.inventory.size())
-				.mapToObj(i -> new Entry(i, entity.inventory.getStack(i)))
+				.mapToObj(i -> new Entry(i, entity.inventory.getStack(i).copy()))
 				.filter(entry -> !entry.stack.isEmpty())
 				.forEach(entry -> pool.add(entry, entry.stack.getCount()));
 
