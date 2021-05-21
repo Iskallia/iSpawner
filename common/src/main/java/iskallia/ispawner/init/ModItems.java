@@ -1,6 +1,8 @@
 package iskallia.ispawner.init;
 
 import iskallia.ispawner.item.SpawnerControllerItem;
+import iskallia.ispawner.item.nbt.ItemNBT;
+import iskallia.ispawner.item.nbt.SpawnData;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -28,6 +30,12 @@ public class ModItems extends ModRegistries {
 		}
 
 		return register(ITEMS, name, item);
+	}
+
+	public static class NBT {
+		public static void register() {
+			ItemNBT.registerOverride(stack -> ModConfigs.SURVIVAL_SPAWNER.itemWhitelist.contains(stack.getItem()), SpawnData::new);
+		}
 	}
 
 }

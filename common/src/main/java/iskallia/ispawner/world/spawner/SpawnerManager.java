@@ -64,13 +64,12 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
 		if(this.actions.isEmpty())return;
 
-		WeightedList<ItemStack> pool = new WeightedList<>();
+		WeightedList<Entry> pool = new WeightedList<>();
 
 		IntStream.range(0, entity.inventory.size())
-				.mapToObj(i -> entity.inventory.getStack(i))
-				.filter(stack -> !stack.isEmpty())
-				.forEach(stack -> pool.add(stack.copy(), stack.getCount()));
-
+				.mapToObj(i -> new Entry(i, entity.inventory.getStack(i)))
+				.filter(entry -> !entry.stack.isEmpty())
+				.forEach(entry -> pool.add(entry, entry.stack.getCount()));
 
 		if(pool.isEmpty())return;
 		BlockPos pos = entity.getPos();
@@ -101,9 +100,13 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 		}
 
 		for(int i = 0; i < this.settings.getAttempts(); i++) {
+			Entry entry = pool.getRandom(random);
+
 			this.actions.getRandom(random)
 					.toAbsolute(entity.getCenterPos(), entity.getRotation())
-					.execute(world, pool.getRandom(random).copy());
+					.execute(world, entry.stack.copy());
+
+			entity.onChargeUsed(entry.stack, entry.index);
 		}
 	}
 
@@ -136,6 +139,16 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 		});
 
 		this.settings.readFromNBT(nbt.getCompound("Settings"));
+	}
+
+	public static class Entry {
+		public int index;
+		public ItemStack stack;
+
+		public Entry(int index, ItemStack stack) {
+			this.index = index;
+			this.stack = stack;
+		}
 	}
 
 }

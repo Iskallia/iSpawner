@@ -21,6 +21,7 @@ public class ModRegistries {
 	public static void register() {
 		ModItems.register();
 		ModBlocks.register();
+		ModItems.NBT.register();
 		ModBlocks.Entities.register();
 		ModMenus.register();
 		ModNetwork.register();

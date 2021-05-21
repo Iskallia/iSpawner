@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -91,6 +92,10 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		}
 
 		return null;
+	}
+
+	public void onChargeUsed(ItemStack stack, int index) {
+
 	}
 
 	public BlockPos getOffset() {
