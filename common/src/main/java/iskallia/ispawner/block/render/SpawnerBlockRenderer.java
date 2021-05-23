@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity> {
+public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> extends BlockEntityRenderer<T> {
 
 	public static final Map<Integer, Color> COLOR_PER_WEIGHT = new LinkedHashMap<>();
 
@@ -45,7 +45,7 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 	}
 
 	@Override
-	public void render(SpawnerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+	public void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		ClientPlayerEntity player = MinecraftClient.getInstance().player;
 		if(player == null)return;
 
@@ -79,7 +79,7 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 		this.renderEntity(entity, tickDelta, matrices, vertexConsumers, light, overlay);
 	}
 
-	public boolean tryRender(SpawnerBlockEntity entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack) {
+	public boolean tryRender(T entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack) {
 		if(stack.getItem() == ModItems.SPAWNER_CONTROLLER) {
 			SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
 
@@ -98,7 +98,7 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 		return true;
 	}
 
-	public void renderEntity(SpawnerBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+	public void renderEntity(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		ItemStack stack = this.getRenderedItem(entity);
 
@@ -116,7 +116,7 @@ public class SpawnerBlockRenderer extends BlockEntityRenderer<SpawnerBlockEntity
 		matrices.pop();
 	}
 
-	private ItemStack getRenderedItem(SpawnerBlockEntity entity) {
+	private ItemStack getRenderedItem(T entity) {
 		List<ItemStack> items = IntStream.range(0, entity.inventory.size())
 				.mapToObj(i -> entity.inventory.getStack(i))
 				.filter(stack -> !stack.isEmpty())

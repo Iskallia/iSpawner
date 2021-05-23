@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "ispawner:block/survival_spawner"
+    }
+  }
+}

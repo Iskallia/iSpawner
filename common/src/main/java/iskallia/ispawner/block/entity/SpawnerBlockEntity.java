@@ -70,7 +70,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	@Override
 	public void tick() {
 		if(this.getWorld() == null)return;
-		this.manager.tick(this.getWorld(), this.getWorld().random, this);
+		this.manager.tick(this.getWorld(), this.getWorld().getRandom(), this);
 	}
 
 	@Override
@@ -85,10 +85,10 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		if(this.getCachedState().getBlock() == ModBlocks.SPAWNER) {
+		if(player.isCreative()) {
 			return new SpawnerScreenHandler(syncId, inv, this);
-		} else if(this.getCachedState().getBlock() == ModBlocks.SURVIVAL_SPAWNER) {
-			return new SurvivalSpawnerScreenHandler(syncId, inv, this);
+		} else if(this instanceof SurvivalSpawnerBlockEntity) {
+			return new SurvivalSpawnerScreenHandler(syncId, inv, (SurvivalSpawnerBlockEntity)this);
 		}
 
 		return null;

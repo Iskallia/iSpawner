@@ -17,7 +17,7 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 
 	protected int attempts = 4;
 	protected int spawnDelay = 500;
-	protected Mode mode = Mode.REDSTONE_PULSE;
+	protected Mode mode = Mode.REDSTONE_ON;
 	protected int checkRadius = 16;
 	protected int playerRadius = 16;
 

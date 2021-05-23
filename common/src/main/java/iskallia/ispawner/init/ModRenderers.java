@@ -1,5 +1,7 @@
 package iskallia.ispawner.init;
 
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.block.render.SpawnerBlockRenderer;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
@@ -13,16 +15,19 @@ import java.util.Map;
 public class ModRenderers extends ModRegistries {
 
 	public static class BlockEntities extends ModRenderers {
-		public static SpawnerBlockRenderer SPAWNER;
+		public static SpawnerBlockRenderer<SpawnerBlockEntity> SPAWNER;
+		public static SpawnerBlockRenderer<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
 		public static void register(Map<BlockEntityType<?>, BlockEntityRenderer<?>> registry, BlockEntityRenderDispatcher dispatcher) {
-			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, new SpawnerBlockRenderer(dispatcher));
+			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, new SpawnerBlockRenderer<>(dispatcher));
+			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, new SpawnerBlockRenderer<>(dispatcher));
 		}
 	}
 
 	public static class RenderLayers {
 		public static void register(Map<Block, RenderLayer> registry, boolean fancyGraphicsOrBetter) {
 			ModRenderers.register(registry, ModBlocks.SPAWNER, RenderLayer.getCutout());
+			ModRenderers.register(registry, ModBlocks.SURVIVAL_SPAWNER, RenderLayer.getCutout());
 		}
 	}
 

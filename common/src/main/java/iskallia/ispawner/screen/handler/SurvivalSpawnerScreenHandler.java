@@ -1,49 +1,40 @@
 package iskallia.ispawner.screen.handler;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.init.ModMenus;
-import iskallia.ispawner.init.ModNetwork;
 import iskallia.ispawner.inventory.SimpleInventory;
-import iskallia.ispawner.net.packet.UpdateSettingsS2CPacket;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 
-	//copy of SpawnerScreenHandler
 	private final PlayerInventory playerInventory;
 	private final SimpleInventory spawnerInventory;
-	private SpawnerBlockEntity spawner;
-	private boolean sentSettings;
+	private SurvivalSpawnerBlockEntity spawner;
 
 	public SurvivalSpawnerScreenHandler(int syncId, PlayerInventory playerInventory) {
-		this(syncId, playerInventory, new SimpleInventory(27));
+		this(syncId, playerInventory, new SimpleInventory(1));
 	}
 
-	public SurvivalSpawnerScreenHandler(int syncId, PlayerInventory playerInventory, SpawnerBlockEntity spawner) {
-		this(syncId, playerInventory, spawner.getInventory());
+	public SurvivalSpawnerScreenHandler(int syncId, PlayerInventory playerInventory, SurvivalSpawnerBlockEntity spawner) {
+		this(syncId, playerInventory, spawner.getInput());
 		this.spawner = spawner;
 	}
 
 	protected SurvivalSpawnerScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory spawnerInventory) {
-		super(ModMenus.SPAWNER, syncId);
+		super(ModMenus.SURVIVAL_SPAWNER, syncId);
 		this.playerInventory = playerInventory;
 		this.spawnerInventory = spawnerInventory;
 		spawnerInventory.onOpen(playerInventory.player);
 
-		int n;
-		int m;
+		int n, m;
 
-		for(n = 0; n < 3; ++n) {
-			for(m = 0; m < 9; ++m) {
-				this.addSlot(new Slot(this.spawnerInventory, m + n * 9, 8 + m * 18 + 110, 18 + n * 18));
-			}
-		}
+		this.addSlot(new Slot(this.spawnerInventory, 0, 8 + 110, 18));
 
 		for(n = 0; n < 3; ++n) {
 			for(m = 0; m < 9; ++m) {
@@ -53,17 +44,6 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 
 		for(n = 0; n < 9; ++n) {
 			this.addSlot(new Slot(playerInventory, n, 8 + n * 18 + 110, 161 - 18));
-		}
-	}
-
-	@Override
-	public void sendContentUpdates() {
-		super.sendContentUpdates();
-
-		if(this.spawner != null && !this.spawner.getWorld().isClient && !this.sentSettings) {
-			ModNetwork.CHANNEL.sendToPlayer((ServerPlayerEntity)this.playerInventory.player,
-					new UpdateSettingsS2CPacket(this.getSpawner().manager.settings));
-			this.sentSettings = true;
 		}
 	}
 

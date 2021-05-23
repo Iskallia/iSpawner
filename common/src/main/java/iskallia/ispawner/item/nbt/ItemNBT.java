@@ -30,10 +30,7 @@ public abstract class ItemNBT implements INBTSerializable<CompoundTag> {
     public ItemNBT(CompoundTag delegate, String tagKey) {
         this.delegate = delegate;
         this.tagKey = tagKey;
-
-        if(this.getDelegate() != null) {
-            this.readFromNBT(this.getDelegate().getCompound(this.getTagKey()));
-        }
+        this.readFromNBT(this.getDelegate() != null ? this.getDelegate().getCompound(this.getTagKey()) : new CompoundTag());
 	}
 
     public CompoundTag getDelegate() {

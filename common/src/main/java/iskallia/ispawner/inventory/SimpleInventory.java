@@ -5,6 +5,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 
 import java.util.Arrays;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,6 +19,10 @@ public class SimpleInventory extends FixedInventory {
 		this.stacks = DefaultedList.ofSize(this.size, ItemStack.EMPTY);
 		this.availableSlots = Arrays.stream(Direction.values())
 				.collect(Collectors.toMap(e -> e, e -> IntStream.range(0, this.size).toArray()));
+	}
+
+	public OptionalInt getEmptySlot() {
+		return IntStream.range(0, this.size()).filter(i -> this.getStack(i).isEmpty()).findFirst();
 	}
 
 }

@@ -2,6 +2,7 @@ package iskallia.ispawner.init;
 
 import com.mojang.datafixers.types.Type;
 import iskallia.ispawner.block.SpawnerBlock;
+import iskallia.ispawner.block.SurvivalSpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import net.minecraft.block.AbstractBlock;
@@ -30,7 +31,7 @@ public class ModBlocks extends ModRegistries {
 				.requiresTool().strength(100.0F, 1200.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 
-		SURVIVAL_SPAWNER = register("survival_spawner", new SpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
+		SURVIVAL_SPAWNER = register("survival_spawner", new SurvivalSpawnerBlock(AbstractBlock.Settings.of(Material.STONE)
 				.requiresTool().strength(50.0F, 1200.0F).sounds(BlockSoundGroup.METAL).nonOpaque()),
 				block -> new BlockItem(block, new Item.Settings().group(ItemGroup.SEARCH)));
 	}
