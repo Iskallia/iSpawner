@@ -1,7 +1,7 @@
 package iskallia.ispawner.item;
 
+import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
-import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.screen.SpawnerControllerScreen;
 import iskallia.ispawner.world.spawner.SpawnerAction;
 import iskallia.ispawner.world.spawner.SpawnerController;
@@ -39,8 +39,8 @@ public class SpawnerControllerItem extends Item {
 			if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
 				controller.getTarget().ifPresent(spawnerPos -> {
 					BlockEntity blockEntity = world.getBlockEntity(spawnerPos);
-					if(!(blockEntity instanceof SpawnerBlockEntity)) return;
-					SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
+					if(!(blockEntity instanceof SpawnerBlockEntity))return;
+					SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = pos.subtract(spawner.getCenterPos());
 
@@ -69,7 +69,7 @@ public class SpawnerControllerItem extends Item {
 
 		SpawnerController controller = new SpawnerController(context.getStack().getOrCreateSubTag("Controller"));
 
-		if(state.getBlock() == ModBlocks.SPAWNER && !context.getBlockPos().equals(controller.getTarget().orElse(null))) {
+		if(state.getBlock() instanceof SpawnerBlock && !context.getBlockPos().equals(controller.getTarget().orElse(null))) {
 			controller.setTarget(context.getBlockPos());
 
 			if(context.getPlayer() != null) {

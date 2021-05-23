@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -114,8 +115,9 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 
 		ListTag stacksList = new ListTag();
 		this.stacks.forEach(stack -> {
-			stacksList.add(stack.toTag(new CompoundTag()));
+			stacksList.add(this.getStackNBT(stack));
 		});
+
 		nbt.put("Stacks", stacksList);
 
 		ListTag slotsList = new ListTag();
@@ -138,7 +140,7 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 		ListTag stacksList = nbt.getList("Stacks", NBTConstants.COMPOUND);
 
 		for(int i = 0; i < stacksList.size() && i < this.stacks.size(); i++) {
-			this.stacks.set(i, ItemStack.fromTag(stacksList.getCompound(i)));
+			this.stacks.set(i, this.getStackFromNBT(stacksList.getCompound(i)));
 		}
 
 		ListTag slotsList = nbt.getList("AvailableSlots", NBTConstants.COMPOUND);
@@ -149,6 +151,24 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 			int[] slots = tag.getIntArray("Slots");
 			this.availableSlots.put(direction, slots);
 		}
+	}
+
+	protected CompoundTag getStackNBT(ItemStack stack) {
+		CompoundTag tag = new CompoundTag();
+		tag.putString("id", Registry.ITEM.getId(stack.getItem()).toString());
+		tag.putInt("Count", stack.getCount());
+
+		if(stack.getTag() != null) {
+			tag.put("tag", stack.getTag().copy());
+		}
+
+		return tag;
+	}
+
+	protected ItemStack getStackFromNBT(CompoundTag tag) {
+		ItemStack stack = ItemStack.fromTag(tag);
+		stack.setCount(tag.getInt("Count"));
+		return stack;
 	}
 
 	@Override

@@ -25,4 +25,8 @@ public class SimpleInventory extends FixedInventory {
 		return IntStream.range(0, this.size()).filter(i -> this.getStack(i).isEmpty()).findFirst();
 	}
 
+	public boolean isEmpty() {
+		return IntStream.range(0, this.size()).allMatch(i -> this.getStack(i).isEmpty());
+	}
+
 }

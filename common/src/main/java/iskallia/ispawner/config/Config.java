@@ -3,13 +3,19 @@ package iskallia.ispawner.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import iskallia.ispawner.ISpawner;
+import iskallia.ispawner.config.adapter.IdentifierAdapter;
+import iskallia.ispawner.config.adapter.ItemAdapter;
 
 import java.io.*;
 import java.lang.reflect.Type;
 
 public abstract class Config {
 
-	private static final Gson GSON = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+	private static final Gson GSON = new GsonBuilder()
+		.registerTypeAdapterFactory(IdentifierAdapter.FACTORY)
+		.registerTypeAdapterFactory(ItemAdapter.FACTORY)
+		.excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+
 	protected String root = "config/" + ISpawner.MOD_ID + "/";
 	protected String extension = ".json";
 

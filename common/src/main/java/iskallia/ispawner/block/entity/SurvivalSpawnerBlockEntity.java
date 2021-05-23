@@ -5,10 +5,15 @@ import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.item.nbt.SpawnData;
 import iskallia.ispawner.nbt.NBTConstants;
+import iskallia.ispawner.world.spawner.SpawnerAction;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
@@ -35,12 +40,12 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 	public void tick() {
 		super.tick();
 
-		for(int i = 0; i < this.input.size(); i++) {
-			ItemStack stack = this.input.getStack(i);
-			if(stack.isEmpty())continue;
-			if(!this.input.canInsert(i, stack, Direction.NORTH))continue;
+		if(this.inventory.isEmpty()) {
+			for(int i = 0; i < this.input.size(); i++) {
+				ItemStack stack = this.input.getStack(i);
+				if(stack.isEmpty()) continue;
+				if(!this.input.canInsert(i, stack, Direction.NORTH))continue;
 
-			for(int j = 0; j < stack.getCount(); j++) {
 				OptionalInt emptySlot = this.inventory.getEmptySlot();
 
 				if(emptySlot.isPresent()) {
@@ -49,6 +54,26 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 					this.inventory.setStack(emptySlot.getAsInt(), newStack);
 					stack.decrement(1);
 					this.input.setStack(i, stack);
+					break;
+				}
+			}
+		}
+
+		if(this.manager.actions.isEmpty()) {
+			for(int x = -4; x <= 4; x++) {
+				for(int z = -4; z <= 4; z++) {
+					for(int y = -2; y <= 1; y++) {
+						int weight = 4 - Math.max(Math.abs(x), Math.abs(z)) + 1;
+						BlockRotation rotation = this.getReverseRotation();
+						Vec3d hitPosOffset = new Vec3d(0.5D, 1.0D, 0.5D);
+
+						this.manager.addAction(new SpawnerAction(
+							new BlockPos(x, y, z).rotate(rotation),
+							rotation.rotate(Direction.UP),
+							SpawnerAction.rotate(rotation, hitPosOffset),
+							Hand.MAIN_HAND,
+							new Direction[] {Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.DOWN}), weight);
+					}
 				}
 			}
 		}
