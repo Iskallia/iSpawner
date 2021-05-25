@@ -2,6 +2,8 @@
   "block.ispawner.spawner": "Spawner",
   "block.ispawner.survival_spawner": "Survival Spawner",
   "item.ispawner.spawner_controller": "Spawner Controller",
+  "item.ispawner.cage_dust": "Cage Dust",
+  "item.ispawner.cage_piece": "Cage Piece",
   "container.spawner": "Spawner",
   "container.survival_spawner": "Survival Spawner"
 }
