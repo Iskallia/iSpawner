@@ -28,13 +28,14 @@ import net.minecraft.util.math.Direction;
 
 public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, NamedScreenHandlerFactory, InventoryChangedListener {
 
-	public SimpleInventory inventory = new SimpleInventory(27);
+	public final SimpleInventory inventory;
 	public SpawnerManager manager = new SpawnerManager();
 	public SpawnerRenderer renderer = new SpawnerRenderer();
 	public BlockPos offset = BlockPos.ORIGIN;
 
 	protected SpawnerBlockEntity(BlockEntityType<?> type) {
 		super(type);
+		this.inventory = this.createInventory();
 		this.inventory.addListener(this);
 	}
 
@@ -42,13 +43,17 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		this(ModBlocks.Entities.SPAWNER);
 	}
 
-	public SimpleInventory getInventory() {
+	protected SimpleInventory createInventory() {
+		return new SimpleInventory(27);
+	}
+
+	public final SimpleInventory getInventory() {
 		return this.inventory;
 	}
 
 	@Override
 	public CompoundTag write(CompoundTag tag, UpdateType type) {
-		tag.put("Inventory", this.inventory.writeToNBT());
+		tag.put("Inventory", this.getInventory().writeToNBT());
 		tag.put("Manager", this.manager.writeToNBT());
 		tag.put("Offset", NbtHelper.fromBlockPos(this.offset));
 		return tag;
@@ -57,7 +62,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	@Override
 	public void read(BlockState state, CompoundTag tag, UpdateType type) {
 		if(tag.contains("Inventory", NBTConstants.COMPOUND)) {
-			this.inventory.readFromNBT(tag.getCompound("Inventory"));
+			this.getInventory().readFromNBT(tag.getCompound("Inventory"));
 		}
 
 		if(tag.contains("Manager", NBTConstants.COMPOUND)) {
@@ -85,17 +90,11 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		if(player.isCreative()) {
-			return new SpawnerScreenHandler(syncId, inv, this);
-		} else if(this instanceof SurvivalSpawnerBlockEntity) {
-			return new SurvivalSpawnerScreenHandler(syncId, inv, (SurvivalSpawnerBlockEntity)this);
-		}
-
-		return null;
+		return new SpawnerScreenHandler(syncId, inv, this);
 	}
 
-	public void onChargeUsed(ItemStack stack, int index) {
-
+	public boolean onChargeUsed(ItemStack stack, int index) {
+		return true;
 	}
 
 	public BlockPos getOffset() {

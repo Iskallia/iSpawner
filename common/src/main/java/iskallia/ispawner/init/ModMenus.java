@@ -12,7 +12,7 @@ public class ModMenus extends ModRegistries {
 
 	public static void register() {
 		SPAWNER = ModScreens.register(SCREEN_HANDLERS, "spawner", MenuRegistry.of(SpawnerScreenHandler::new));
-		SURVIVAL_SPAWNER = ModScreens.register(SCREEN_HANDLERS, "survival_spawner", MenuRegistry.of(SurvivalSpawnerScreenHandler::new));
+		SURVIVAL_SPAWNER = ModScreens.register(SCREEN_HANDLERS, "survival_spawner", MenuRegistry.ofExtended(SurvivalSpawnerScreenHandler::new));
 	}
 
 }

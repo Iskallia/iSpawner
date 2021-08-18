@@ -1,10 +1,7 @@
 package iskallia.ispawner.init;
 
 import iskallia.ispawner.ISpawner;
-import iskallia.ispawner.net.packet.ModPacket;
-import iskallia.ispawner.net.packet.UpdateControllerC2SPacket;
-import iskallia.ispawner.net.packet.UpdateSettingsC2SPacket;
-import iskallia.ispawner.net.packet.UpdateSettingsS2CPacket;
+import iskallia.ispawner.net.packet.*;
 import me.shedaniel.architectury.networking.NetworkChannel;
 import me.shedaniel.architectury.networking.NetworkManager;
 import me.shedaniel.architectury.platform.Platform;
@@ -47,6 +44,7 @@ public class ModNetwork extends ModRegistries {
 			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, CLIENT_PLAY);
 			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
 			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new , SERVER_PLAY);
+			ModNetwork.register(UpdateRedstoneModeC2SPacket.class, UpdateRedstoneModeC2SPacket::new, SERVER_PLAY);
 		}
 	}
 
@@ -57,6 +55,7 @@ public class ModNetwork extends ModRegistries {
 			ModNetwork.register(UpdateSettingsS2CPacket.class, UpdateSettingsS2CPacket::new, null);
 			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
 			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new , SERVER_PLAY);
+			ModNetwork.register(UpdateRedstoneModeC2SPacket.class, UpdateRedstoneModeC2SPacket::new, SERVER_PLAY);
 
 		}
 	}

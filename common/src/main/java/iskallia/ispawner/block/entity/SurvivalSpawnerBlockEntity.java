@@ -5,10 +5,16 @@ import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.item.nbt.SpawnData;
 import iskallia.ispawner.nbt.NBTConstants;
+import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerAction;
+import me.shedaniel.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -18,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
 
-public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
+public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements ExtendedMenuProvider {
 
 	public SimpleInventory input = new SimpleInventory(1) {
 		@Override
 		public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-			return ModConfigs.SURVIVAL_SPAWNER.itemWhitelist.contains(stack.getItem());
+			return ModConfigs.SURVIVAL_SPAWNER.isWhitelisted(stack);
 		}
 	};
 
@@ -40,15 +46,20 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 	public void tick() {
 		super.tick();
 
-		if(this.inventory.isEmpty()) {
-			for(int i = 0; i < this.input.size(); i++) {
+		if (this.manager.settings.getSpawnDelay() != 200) {
+			this.manager.settings.setSpawnDelay(200);
+			this.sendClientUpdates();
+		}
+
+		if (this.inventory.isEmpty()) {
+			for (int i = 0; i < this.input.size(); i++) {
 				ItemStack stack = this.input.getStack(i);
-				if(stack.isEmpty()) continue;
-				if(!this.input.canInsert(i, stack, Direction.NORTH))continue;
+				if (stack.isEmpty()) continue;
+				if (!this.input.canInsert(i, stack, Direction.NORTH)) continue;
 
 				OptionalInt emptySlot = this.inventory.getEmptySlot();
 
-				if(emptySlot.isPresent()) {
+				if (emptySlot.isPresent()) {
 					ItemStack newStack = new ItemStack(stack.getItem());
 					newStack.setCount(new SpawnData(stack).getCharges());
 					this.inventory.setStack(emptySlot.getAsInt(), newStack);
@@ -80,9 +91,20 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 	}
 
 	@Override
-	public void onChargeUsed(ItemStack stack, int index) {
+	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+		return new SurvivalSpawnerScreenHandler(syncId, inv, this);
+	}
+
+	@Override
+	public void saveExtraData(PacketByteBuf buf) {
+		buf.writeBlockPos(this.getPos());
+	}
+
+	@Override
+	public boolean onChargeUsed(ItemStack stack, int index) {
 		stack.decrement(1);
 		this.inventory.setStack(index, stack);
+		return !stack.isEmpty();
 	}
 
 	@Override

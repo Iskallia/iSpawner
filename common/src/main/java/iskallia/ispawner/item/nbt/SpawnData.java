@@ -45,9 +45,11 @@ public class SpawnData extends ItemNBT {
 
     @Override
     public void readFromNBT(CompoundTag nbt) {
-        if(nbt.contains("Charges", NBTConstants.INT)) {
+        if (nbt.contains("Charges", NBTConstants.INT)) {
             this.charges = nbt.getInt("Charges");
-        } else this.charges = ModConfigs.SURVIVAL_SPAWNER.defaultCharges;
+        } else {
+            this.charges = ModConfigs.SURVIVAL_SPAWNER.defaultCharges;
+        }
     }
 
     @Override

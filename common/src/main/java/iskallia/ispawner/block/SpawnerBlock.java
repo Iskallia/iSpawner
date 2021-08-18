@@ -3,6 +3,7 @@ package iskallia.ispawner.block;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.init.ModItems;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
+import me.shedaniel.architectury.registry.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.PiglinBrain;
@@ -11,6 +12,7 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -64,17 +66,22 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if(player.getStackInHand(hand).getItem() == ModItems.SPAWNER_CONTROLLER)return ActionResult.PASS;
-		if(world.isClient)return ActionResult.SUCCESS;
+		if (player.getStackInHand(hand).getItem() == ModItems.SPAWNER_CONTROLLER) {
+			return ActionResult.PASS;
+		}
+		if (world.isClient() || !(player instanceof ServerPlayerEntity)) {
+			return ActionResult.SUCCESS;
+		}
+		this.openMenu(state, world, pos, (ServerPlayerEntity) player);
+		return ActionResult.CONSUME;
+	}
 
+	protected void openMenu(BlockState state, World world, BlockPos pos, ServerPlayerEntity player) {
 		NamedScreenHandlerFactory factory = this.createScreenHandlerFactory(state, world, pos);
-
-		if(factory != null) {
-			player.openHandledScreen(factory);
+		if (factory != null) {
+			MenuRegistry.openMenu(player, factory);
 			PiglinBrain.onGuardedBlockInteracted(player, true);
 		}
-
-		return ActionResult.CONSUME;
 	}
 
 	@Override
@@ -88,24 +95,27 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 		return blockEntity instanceof SpawnerBlockEntity ? ((SpawnerBlockEntity)blockEntity).inventory : null;
 	}
 
+	@Override
 	public void neighborUpdate(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
 		boolean powered = world.isReceivingRedstonePower(pos);
 
-		if(powered != state.get(POWERED)) {
-			if(powered)this.onPowered(world, pos);
+		if (powered != state.get(POWERED)) {
+			if (powered) this.onPowered(world, pos);
 			world.setBlockState(pos, state.with(POWERED, powered), 3);
 		}
 	}
 
-	public void onPowered(World world, BlockPos pos) {
-		if(world.isClient)return;
+	private void onPowered(World world, BlockPos pos) {
+		if (world.isClient()) return;
 
 		world.getServer().execute(() -> {
 			BlockEntity blockEntity = world.getBlockEntity(pos);
 
-			if(blockEntity instanceof SpawnerBlockEntity) {
-				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
-				spawner.manager.spawn(world, world.random, spawner);
+			if (blockEntity instanceof SpawnerBlockEntity) {
+				SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
+				if (spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
+					spawner.manager.spawn(world, world.random, spawner);
+				}
 			}
 		});
 	}
