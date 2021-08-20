@@ -57,15 +57,6 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 			this.renderTooltip(matrices, new LiteralText(SpawnerSettings.Mode.ALWAYS_ON.text), mouseX, mouseY);
 		}, LiteralText.EMPTY));
 		this.addButton(new TexturedButtonWidget(this.x + 70, this.y + 123, 22, 22,
-				212, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_PULSE ? 0 : 22, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_PULSE ? 44 : 22,
-				TEXTURE, 256, 256, btn -> {
-			if (this.lastKnownMode != SpawnerSettings.Mode.REDSTONE_PULSE) {
-				ModNetwork.CHANNEL.sendToServer(new UpdateRedstoneModeC2SPacket(SpawnerSettings.Mode.REDSTONE_PULSE));
-			}
-		}, (btn, matrices, mouseX, mouseY) -> {
-			this.renderTooltip(matrices, new LiteralText(SpawnerSettings.Mode.REDSTONE_PULSE.text), mouseX, mouseY);
-		}, LiteralText.EMPTY));
-		this.addButton(new TexturedButtonWidget(this.x + 94, this.y + 123, 22, 22,
 				234, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 66 : 88, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 44 : 22,
 				TEXTURE, 256, 256, btn -> {
 			if (this.lastKnownMode != SpawnerSettings.Mode.REDSTONE_ON) {
