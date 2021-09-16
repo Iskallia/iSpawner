@@ -5,7 +5,6 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
-import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerManager;
 import iskallia.ispawner.world.spawner.SpawnerRenderer;
 import net.minecraft.block.BlockState;
@@ -90,7 +89,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-		return new SpawnerScreenHandler(syncId, inv, this);
+		return player.isCreative() ? new SpawnerScreenHandler(syncId, inv, this) : null;
 	}
 
 	public boolean onChargeUsed(ItemStack stack, int index) {
