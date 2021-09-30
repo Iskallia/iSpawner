@@ -1,11 +1,9 @@
 package iskallia.ispawner.world.spawner;
 
-import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -73,13 +71,15 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 				.filter(entry -> !entry.stack.isEmpty())
 				.forEach(entry -> pool.add(entry, entry.stack.getCount()));
 
-		if (pool.isEmpty()) return;
+		if(pool.isEmpty())return;
 		BlockPos pos = entity.getPos();
 
-		PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
-			this.settings.getPlayerRadius(), false);
 
-		if (closestPlayer == null) return;
+		if(this.settings.getPlayerRadius() >= 0) {
+			PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
+				this.settings.getPlayerRadius(), false);
+			if(closestPlayer == null)return;
+		}
 
 		Map<SpawnGroup, Integer> entityMap = new HashMap<>();
 
@@ -93,17 +93,17 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 			entityMap.put(spawnGroup, entityMap.getOrDefault(spawnGroup, 0) + 1);
 		});
 
-		for (Map.Entry<SpawnGroup, Integer> entry: entityMap.entrySet()) {
+		for(Map.Entry<SpawnGroup, Integer> entry: entityMap.entrySet()) {
 			int limit = this.settings.getCapRestrictions().get(entry.getKey()).limit;
 
-			if (limit > 0 && entry.getValue() >= limit) {
+			if(limit > 0 && entry.getValue() >= limit) {
 				return;
 			}
 		}
 
-		for (int i = 0; i < this.settings.getAttempts(); i++) {
+		for(int i = 0; i < this.settings.getAttempts(); i++) {
 			Entry entry = pool.getRandom(random);
-			if (entity.onChargeUsed(entry.stack, entry.index)) {
+			if(entity.onChargeUsed(entry.stack, entry.index)) {
 				this.actions.getRandom(random)
 						.toAbsolute(entity.getCenterPos(), entity.getRotation())
 						.execute(world, entry.stack.copy());

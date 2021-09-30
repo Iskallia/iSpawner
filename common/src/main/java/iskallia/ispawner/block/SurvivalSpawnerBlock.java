@@ -6,11 +6,12 @@ import me.shedaniel.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.PiglinBrain;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class SurvivalSpawnerBlock extends SpawnerBlock {
 
@@ -28,7 +29,14 @@ public class SurvivalSpawnerBlock extends SpawnerBlock {
     }
 
     @Override
+    public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        return blockEntity instanceof SurvivalSpawnerBlockEntity ? ((SurvivalSpawnerBlockEntity)blockEntity).input : null;
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockView world) {
         return new SurvivalSpawnerBlockEntity();
     }
+
 }

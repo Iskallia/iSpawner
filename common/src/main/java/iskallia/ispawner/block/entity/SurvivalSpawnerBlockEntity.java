@@ -46,8 +46,8 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 	public void tick() {
 		super.tick();
 
-		if (this.manager.settings.getSpawnDelay() != 200) {
-			this.manager.settings.setSpawnDelay(200);
+		if(!this.manager.settings.equals(ModConfigs.SURVIVAL_SPAWNER.defaultSettings)) {
+			this.manager.settings = ModConfigs.SURVIVAL_SPAWNER.defaultSettings.copy();
 			this.sendClientUpdates();
 		}
 

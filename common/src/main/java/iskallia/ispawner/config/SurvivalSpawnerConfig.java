@@ -1,6 +1,7 @@
 package iskallia.ispawner.config;
 
 import com.google.gson.annotations.Expose;
+import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class SurvivalSpawnerConfig extends Config {
 
 	@Expose public int defaultCharges;
+	@Expose public SpawnerSettings defaultSettings;
 	@Expose public List<Item> itemWhitelist;
 
     @Override
@@ -22,10 +24,12 @@ public class SurvivalSpawnerConfig extends Config {
     @Override
     protected void reset() {
 		this.defaultCharges = 10;
+		this.defaultSettings = new SpawnerSettings();
 		this.itemWhitelist = Registry.ITEM.stream().filter(item -> item instanceof SpawnEggItem).collect(Collectors.toList());
     }
 
     public boolean isWhitelisted(ItemStack stack) {
         return this.itemWhitelist.contains(stack.getItem());
     }
+
 }

@@ -1,6 +1,6 @@
 package iskallia.ispawner.world.spawner;
 
-import com.google.common.collect.Maps;
+import com.google.gson.annotations.Expose;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.net.packet.IByteSerializable;
@@ -10,18 +10,20 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Util;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBTSerializable<CompoundTag> {
 
-	protected int attempts = 4;
-	protected int spawnDelay = 500;
-	protected Mode mode = Mode.REDSTONE_ON;
-	protected int checkRadius = 16;
-	protected int playerRadius = 16;
+	@Expose protected int attempts = 4;
+	@Expose protected int spawnDelay = 500;
+	@Expose protected Mode mode = Mode.REDSTONE_ON;
+	@Expose protected int checkRadius = 16;
+	@Expose protected int playerRadius = 16;
 
-	protected Map<SpawnGroup, CapRestriction> capRestrictions = Util.make(Maps.newHashMap(), map -> {
+	@Expose protected Map<SpawnGroup, CapRestriction> capRestrictions = Util.make(new HashMap<>(), map -> {
 		map.put(SpawnGroup.MONSTER, new CapRestriction(SpawnGroup.MONSTER, 16));
 		map.put(SpawnGroup.CREATURE, new CapRestriction(SpawnGroup.CREATURE, -1));
 		map.put(SpawnGroup.AMBIENT, new CapRestriction(SpawnGroup.AMBIENT, -1));
@@ -165,6 +167,24 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		return copy;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if(this == o)return true;
+		if(!(o instanceof SpawnerSettings))return false;
+		SpawnerSettings other = (SpawnerSettings)o;
+		return this.getAttempts() == other.getAttempts()
+			&& this.getSpawnDelay() == other.getSpawnDelay()
+			&& this.getCheckRadius() == other.getCheckRadius()
+			&& this.getPlayerRadius() == other.getPlayerRadius()
+			&& this.getMode() == other.getMode()
+			&& Objects.equals(this.getCapRestrictions(), other.getCapRestrictions());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getAttempts(), getSpawnDelay(), getMode(), getCheckRadius(), getPlayerRadius(), getCapRestrictions());
+	}
+
 	public enum Mode {
 		REDSTONE_PULSE("Redstone Pulse"), REDSTONE_ON("Redstone On"), ALWAYS_ON("Always On");
 
@@ -176,8 +196,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 	}
 
 	public static class CapRestriction implements INBTSerializable<CompoundTag> {
-		protected SpawnGroup spawnGroup;
-		public int limit;
+		@Expose protected SpawnGroup spawnGroup;
+		@Expose public int limit;
 
 		public CapRestriction(SpawnGroup spawnGroup, int limit) {
 			this.spawnGroup = spawnGroup;
