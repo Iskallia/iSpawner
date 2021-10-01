@@ -43,7 +43,7 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 			return;
 		}
-
+	
 		if(weight > 0) {
 			this.actions.add(action, weight);
 		}
@@ -73,7 +73,6 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 		if(pool.isEmpty())return;
 		BlockPos pos = entity.getPos();
-
 
 		if(this.settings.getPlayerRadius() >= 0) {
 			PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),

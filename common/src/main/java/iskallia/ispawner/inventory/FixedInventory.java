@@ -145,7 +145,7 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 
 		ListTag slotsList = nbt.getList("AvailableSlots", NBTConstants.COMPOUND);
 
-		for(int i = 0; i < stacksList.size(); i++) {
+		for(int i = 0; i < slotsList.size(); i++) {
 			CompoundTag tag = slotsList.getCompound(i);
 			Direction direction = Direction.values()[tag.getInt("Direction")];
 			int[] slots = tag.getIntArray("Slots");

@@ -158,12 +158,12 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 	public SpawnerSettings copy() {
 		SpawnerSettings copy = new SpawnerSettings();
 		copy.setAttempts(this.getAttempts());
-		copy.setSpawnDelay(copy.getSpawnDelay());
+		copy.setSpawnDelay(this.getSpawnDelay());
 		copy.setMode(this.getMode());
 		copy.setCapRestrictions(this.getCapRestrictions().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
 				o -> new CapRestriction(o.getValue().spawnGroup, o.getValue().limit))));
 		copy.setCheckRadius(this.getCheckRadius());
-		copy.setPlayerRadius(this.getCheckRadius());
+		copy.setPlayerRadius(this.getPlayerRadius());
 		return copy;
 	}
 

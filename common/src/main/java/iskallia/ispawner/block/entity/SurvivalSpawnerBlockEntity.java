@@ -7,6 +7,7 @@ import iskallia.ispawner.item.nbt.SpawnData;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerAction;
+import iskallia.ispawner.world.spawner.SpawnerSettings;
 import me.shedaniel.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -46,8 +47,11 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 	public void tick() {
 		super.tick();
 
-		if(!this.manager.settings.equals(ModConfigs.SURVIVAL_SPAWNER.defaultSettings)) {
-			this.manager.settings = ModConfigs.SURVIVAL_SPAWNER.defaultSettings.copy();
+		SpawnerSettings newConfig = ModConfigs.SURVIVAL_SPAWNER.defaultSettings.copy();
+		newConfig.setMode(this.manager.settings.getMode());
+
+		if(!this.manager.settings.equals(newConfig)) {
+			this.manager.settings = newConfig;
 			this.sendClientUpdates();
 		}
 
