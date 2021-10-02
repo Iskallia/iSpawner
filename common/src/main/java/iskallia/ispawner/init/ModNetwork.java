@@ -56,7 +56,6 @@ public class ModNetwork extends ModRegistries {
 			ModNetwork.register(UpdateControllerC2SPacket.class, UpdateControllerC2SPacket::new, SERVER_PLAY);
 			ModNetwork.register(UpdateSettingsC2SPacket.class, UpdateSettingsC2SPacket::new , SERVER_PLAY);
 			ModNetwork.register(UpdateRedstoneModeC2SPacket.class, UpdateRedstoneModeC2SPacket::new, SERVER_PLAY);
-
 		}
 	}
 
