@@ -105,10 +105,9 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 	}
 
 	@Override
-	public boolean onChargeUsed(ItemStack stack, int index) {
+	public void onChargeUsed(ItemStack stack, int index) {
 		stack.decrement(1);
 		this.inventory.setStack(index, stack);
-		return !stack.isEmpty();
 	}
 
 	@Override

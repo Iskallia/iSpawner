@@ -73,7 +73,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 
 	@Override
 	public void tick() {
-		if(this.getWorld() == null)return;
+		if(this.getWorld() == null || this.getWorld().isClient())return;
 		this.manager.tick(this.getWorld(), this.getWorld().getRandom(), this);
 	}
 
@@ -92,8 +92,12 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		return player.isCreative() ? new SpawnerScreenHandler(syncId, inv, this) : null;
 	}
 
-	public boolean onChargeUsed(ItemStack stack, int index) {
+	public boolean canUseCharge(ItemStack stack, int index) {
 		return true;
+	}
+
+	public void onChargeUsed(ItemStack stack, int index) {
+
 	}
 
 	public BlockPos getOffset() {

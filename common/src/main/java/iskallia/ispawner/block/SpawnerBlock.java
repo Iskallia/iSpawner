@@ -91,8 +91,9 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public SidedInventory getInventory(BlockState state, WorldAccess world, BlockPos pos) {
-		BlockEntity blockEntity = world.getBlockEntity(pos);
-		return blockEntity instanceof SpawnerBlockEntity ? ((SpawnerBlockEntity)blockEntity).inventory : null;
+		//BlockEntity blockEntity = world.getBlockEntity(pos);
+		//return blockEntity instanceof SpawnerBlockEntity ? ((SpawnerBlockEntity)blockEntity).inventory : null;
+		return null; //Please don't hopper items out of the creative spawners...
 	}
 
 	@Override

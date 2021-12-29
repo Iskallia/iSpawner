@@ -1,18 +1,30 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.nbt.INBTSerializable;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.MobSpawnerBlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.MobSpawnerLogic;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
@@ -74,14 +86,16 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 		return this.directions;
 	}
 
-	public void execute(World world, ItemStack stack) {
-		stack.useOnBlock(new SpawnerUsageContext(world, stack, this));
-
+	public boolean execute(World world, ItemStack stack, boolean checkEgg) {
 		if(stack.getItem() instanceof ThrowablePotionItem) {
-			PotionEntity potion = new PotionEntity(world, this.getHitPos().getX(), this.getHitPos().getY(), this.getHitPos().getZ());
-			potion.setItem(stack);
-			world.spawnEntity(potion);
+			return this.applyPotionOverride(world, stack);
+		} else if(stack.getItem() instanceof SpawnEggItem && checkEgg) {
+			return this.applyEggOverride(world, stack);
+		} else {
+			stack.useOnBlock(new SpawnerUsageContext(world, stack, this));
 		}
+
+		return true;
 	}
 
 	@Override
@@ -104,6 +118,60 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 		this.hitPos = new Vec3d(nbt.getDouble("HitPosX"), nbt.getDouble("HitPosY"), nbt.getDouble("HitPosZ"));
 		this.hand = Hand.values()[nbt.getInt("Hand")];
 		this.directions = Arrays.stream(nbt.getIntArray("Directions")).mapToObj(i -> Direction.values()[i]).toArray(Direction[]::new);
+	}
+
+	public boolean applyPotionOverride(World world, ItemStack stack) {
+		PotionEntity potion = new PotionEntity(world, this.getHitPos().getX(), this.getHitPos().getY(), this.getHitPos().getZ());
+		potion.setItem(stack);
+		world.spawnEntity(potion);
+		return true;
+	}
+
+	public boolean applyEggOverride(World world, ItemStack stack) {
+		BlockState blockState = world.getBlockState(this.getPos());
+		EntityType<?> entityType = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getTag());
+
+		if(blockState.isOf(Blocks.SPAWNER)) {
+			BlockEntity blockEntity = world.getBlockEntity(this.getPos());
+
+			if(blockEntity instanceof MobSpawnerBlockEntity) {
+				MobSpawnerLogic mobSpawnerLogic = ((MobSpawnerBlockEntity)blockEntity).getLogic();
+				mobSpawnerLogic.setEntityId(entityType);
+				blockEntity.markDirty();
+				world.updateListeners(this.getPos(), blockState, blockState, 3);
+				stack.decrement(1);
+				return true;
+			}
+		}
+
+		BlockPos blockPos3;
+
+		if(blockState.getCollisionShape(world, this.getPos()).isEmpty()) {
+			blockPos3 = this.getPos();
+		} else {
+			blockPos3 = this.getPos().offset(this.getSide());
+		}
+
+		EntityType<?> entityType2 = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getTag());
+
+		Entity entity = entityType2.create((ServerWorld)world, stack.getTag(), stack.hasCustomName() ? stack.getName() : null, null, blockPos3,
+			SpawnReason.SPAWN_EGG, true, !Objects.equals(this.getPos(), blockPos3) && this.getSide() == Direction.UP);
+
+		boolean isMob = entity instanceof MobEntity;
+
+		if(entity != null && (!world.isSpaceEmpty(entity.getBoundingBox())
+			|| isMob && !((MobEntity)entity).canSpawn(world, SpawnReason.SPAWNER)
+			|| isMob && !((MobEntity)entity).canSpawn(world))) {
+			entity = null;
+		}
+
+		if(entity != null) {
+			((ServerWorld)world).spawnEntityAndPassengers(entity);
+			stack.decrement(1);
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override

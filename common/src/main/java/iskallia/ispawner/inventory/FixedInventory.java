@@ -37,7 +37,7 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 
 	@Override
 	public int[] getAvailableSlots(Direction side) {
-		return this.availableSlots.get(side);
+		return this.availableSlots.getOrDefault(side, new int[0]);
 	}
 
 	@Override

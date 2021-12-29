@@ -1,6 +1,7 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
@@ -62,7 +63,7 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 	}
 
 	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
-		if (this.actions.isEmpty()) return;
+		if(this.actions.isEmpty()) return;
 
 		WeightedList<Entry> pool = new WeightedList<>();
 
@@ -71,13 +72,13 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 				.filter(entry -> !entry.stack.isEmpty())
 				.forEach(entry -> pool.add(entry, entry.stack.getCount()));
 
-		if(pool.isEmpty())return;
+		if(pool.isEmpty()) return;
 		BlockPos pos = entity.getPos();
 
 		if(this.settings.getPlayerRadius() >= 0) {
 			PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
 				this.settings.getPlayerRadius(), false);
-			if(closestPlayer == null)return;
+			if(closestPlayer == null) return;
 		}
 
 		Map<SpawnGroup, Integer> entityMap = new HashMap<>();
@@ -102,10 +103,15 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 		for(int i = 0; i < this.settings.getAttempts(); i++) {
 			Entry entry = pool.getRandom(random);
-			if(entity.onChargeUsed(entry.stack, entry.index)) {
-				this.actions.getRandom(random)
+
+			if(entity.canUseCharge(entry.stack, entry.index)) {
+				boolean result = this.actions.getRandom(random)
 						.toAbsolute(entity.getCenterPos(), entity.getRotation())
-						.execute(world, entry.stack.copy());
+						.execute(world, entry.stack.copy(), entity instanceof SurvivalSpawnerBlockEntity);
+
+				if(result) {
+					entity.onChargeUsed(entry.stack, entry.index);
+				}
 			}
 		}
 	}
