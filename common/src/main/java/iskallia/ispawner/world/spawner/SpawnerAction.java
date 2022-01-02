@@ -159,9 +159,7 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
 		boolean isMob = entity instanceof MobEntity;
 
-		if(entity != null && (!world.isSpaceEmpty(entity.getBoundingBox())
-			|| isMob && !((MobEntity)entity).canSpawn(world, SpawnReason.SPAWNER)
-			|| isMob && !((MobEntity)entity).canSpawn(world))) {
+		if(entity != null && (!world.isSpaceEmpty(entity.getBoundingBox()) || isMob && !((MobEntity)entity).canSpawn(world))) {
 			entity = null;
 		}
 
