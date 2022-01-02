@@ -4,6 +4,7 @@
   "package": "iskallia.ispawner.forge.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinCapabilityProvider"
   ],
   "client": [
     "MixinRenderLayer",
