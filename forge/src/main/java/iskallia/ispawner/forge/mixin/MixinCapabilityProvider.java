@@ -16,15 +16,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CapabilityProvider.class)
 public abstract class MixinCapabilityProvider implements ICapabilityProvider {
 
-	@Inject(method = "getCapability", at = @At("HEAD"), remap = false)
+	@Inject(method = "getCapability", at = @At("HEAD"), cancellable = true, remap = false)
 	public <T> void getCapability(Capability<T> cap, Direction side, CallbackInfoReturnable<LazyOptional<T>> ci) {
 		if((Object)this instanceof SurvivalSpawnerBlockEntity) {
 			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 				SurvivalSpawnerBlockEntity entity = (SurvivalSpawnerBlockEntity)(Object)this;
-				ci.setReturnValue(LazyOptional.of(() -> new InvWrapper(entity.getInventory())).cast());
+				ci.setReturnValue(LazyOptional.of(() -> new InvWrapper(entity.getInput())).cast());
+			} else {
+				ci.setReturnValue(LazyOptional.empty());
 			}
-
-			ci.setReturnValue(LazyOptional.empty());
 		}
 	}
 
