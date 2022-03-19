@@ -1,0 +1,9 @@
+{
+  "block.ispawner.spawner": "Générateur",
+  "block.ispawner.survival_spawner": "Générateur Survie",
+  "item.ispawner.spawner_controller": "Générateur Controller",
+  "item.ispawner.cage_dust": "Poussière de cage",
+  "item.ispawner.cage_piece": "Morceau de cage",
+  "container.spawner": "Générateur",
+  "container.survival_spawner": "Générateur Survie"
+}
