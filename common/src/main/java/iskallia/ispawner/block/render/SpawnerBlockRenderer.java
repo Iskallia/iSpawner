@@ -114,7 +114,7 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements Block
 
 			matrices.scale(1.5F, 1.5F, 1.5F);
 			matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion((float)MathHelper.lerp(tickDelta, prev, next) - 10.0F));
-			MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, light, overlay, matrices, vertexConsumers);
+			MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, light, overlay, matrices, vertexConsumers, 0);
 		}
 
 		matrices.pop();
