@@ -165,7 +165,7 @@ public class SpawnerRenderer {
 		public void drawLine(MatrixStack matrices, VertexConsumer vertexConsumer,
 		                     double x1, double y1, double z1,
 		                     double x2, double y2, double z2, BlockPos offset) {
-			Matrix4f matrix = matrices.peek().getModel();
+			Matrix4f matrix = matrices.peek().getPositionMatrix();
 			BlockPos p = this.pos.add(offset);
 
 			vertexConsumer.vertex(matrix, p.getX() + (float)x1, p.getY() + (float)y1, p.getZ() + (float)z1)

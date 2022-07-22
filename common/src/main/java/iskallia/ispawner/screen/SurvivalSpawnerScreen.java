@@ -150,7 +150,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 		renderBuffers.draw();
 
 		RenderSystem.enableDepthTest();
-		RenderSystem.enableAlphaTest();
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.enableBlend();
 		RenderSystem.enableTexture();
 
