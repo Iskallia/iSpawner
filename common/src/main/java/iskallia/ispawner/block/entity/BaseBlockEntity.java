@@ -3,38 +3,40 @@ package iskallia.ispawner.block.entity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.util.math.BlockPos;
 
 public abstract class BaseBlockEntity extends BlockEntity {
 
-	public BaseBlockEntity(BlockEntityType<?> type) {
-		super(type);
+	public BaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 
-	public abstract CompoundTag write(CompoundTag tag, UpdateType type);
+	public abstract NbtCompound write(NbtCompound tag, UpdateType type);
 
-	public abstract void read(BlockState state, CompoundTag tag, UpdateType type);
-
-	@Override
-	public final CompoundTag toTag(CompoundTag tag) {
-		return this.write(super.toTag(tag), UpdateType.SERVER);
-	}
+	public abstract void read(NbtCompound tag, UpdateType type);
 
 	@Override
-	public final void fromTag(BlockState state, CompoundTag tag) {
-		super.fromTag(state, tag);
-		this.read(state, tag, UpdateType.SERVER);
+	public final void writeNbt(NbtCompound tag) {
+		super.writeNbt(tag);
+		this.write(tag, UpdateType.SERVER);
 	}
 
 	@Override
-	public CompoundTag toInitialChunkDataTag() {
-		return this.write(super.toInitialChunkDataTag(), UpdateType.INITIAL_PACKET);
+	public final void readNbt(NbtCompound tag) {
+		super.readNbt(tag);
+		this.read(tag, UpdateType.SERVER);
+	}
+
+	@Override
+	public NbtCompound toInitialChunkDataNbt() {
+		return this.write(super.toInitialChunkDataNbt(), UpdateType.INITIAL_PACKET);
 	}
 
 	@Override
 	public final BlockEntityUpdateS2CPacket toUpdatePacket() {
-		return new BlockEntityUpdateS2CPacket(this.getPos(), 127, this.write(new CompoundTag(), UpdateType.UPDATE_PACKET));
+		return BlockEntityUpdateS2CPacket.create(this, e -> ((BaseBlockEntity)e).write(new NbtCompound(), UpdateType.UPDATE_PACKET));
 	}
 
 	public void sendClientUpdates() {

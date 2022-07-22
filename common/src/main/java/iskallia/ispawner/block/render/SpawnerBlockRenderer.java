@@ -9,15 +9,14 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3f;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,7 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> extends BlockEntityRenderer<T> {
+public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements BlockEntityRenderer<T> {
 
 	public static final Map<Integer, Color> COLOR_PER_WEIGHT = new LinkedHashMap<>();
 
@@ -40,8 +39,13 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> extends BlockEnt
 		COLOR_PER_WEIGHT.put(7, new Color(255, 255, 255));
 	}
 
-	public SpawnerBlockRenderer(BlockEntityRenderDispatcher dispatcher) {
-		super(dispatcher);
+	public SpawnerBlockRenderer() {
+
+	}
+
+	@Override
+	public int getRenderDistance() {
+		return 128;
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> extends BlockEnt
 
 	public boolean tryRender(T entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack) {
 		if(stack.getItem() == ModItems.SPAWNER_CONTROLLER) {
-			SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
+			SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 
 			if(controller.getTarget().isPresent() && controller.getTarget().get().equals(entity.getPos())) {
 				entity.renderer.refresh(entity);
@@ -109,7 +113,7 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> extends BlockEnt
 			double next = (prev + 9.0D) % 360.0D;
 
 			matrices.scale(1.5F, 1.5F, 1.5F);
-			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion((float)MathHelper.lerp(tickDelta, prev, next) - 10.0F));
+			matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion((float)MathHelper.lerp(tickDelta, prev, next) - 10.0F));
 			MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.GROUND, light, overlay, matrices, vertexConsumers);
 		}
 

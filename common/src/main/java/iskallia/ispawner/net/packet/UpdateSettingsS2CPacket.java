@@ -10,8 +10,8 @@ public class UpdateSettingsS2CPacket implements ModPacket<ClientPlayNetworkHandl
 
 	protected SpawnerSettings settings;
 
-	public UpdateSettingsS2CPacket() {
-
+	public UpdateSettingsS2CPacket(PacketByteBuf buf) {
+		this.settings = new SpawnerSettings().readFromBuf(buf);
 	}
 
 	public UpdateSettingsS2CPacket(SpawnerSettings settings) {
@@ -20,11 +20,6 @@ public class UpdateSettingsS2CPacket implements ModPacket<ClientPlayNetworkHandl
 
 	public SpawnerSettings getSettings() {
 		return this.settings;
-	}
-
-	@Override
-	public void read(PacketByteBuf buf) {
-		this.settings = new SpawnerSettings().readFromBuf(buf);
 	}
 
 	@Override

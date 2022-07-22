@@ -14,32 +14,32 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 
-public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, NamedScreenHandlerFactory, InventoryChangedListener {
+public class SpawnerBlockEntity extends BaseBlockEntity implements NamedScreenHandlerFactory, InventoryChangedListener {
 
 	public final SimpleInventory inventory;
 	public SpawnerManager manager = new SpawnerManager();
 	public SpawnerRenderer renderer = new SpawnerRenderer();
 	public BlockPos offset = BlockPos.ORIGIN;
 
-	protected SpawnerBlockEntity(BlockEntityType<?> type) {
-		super(type);
-		this.inventory = this.createInventory();
-		this.inventory.addListener(this);
+	public SpawnerBlockEntity(BlockPos pos, BlockState state) {
+		this(ModBlocks.Entities.SPAWNER, pos, state);
 	}
 
-	public SpawnerBlockEntity() {
-		this(ModBlocks.Entities.SPAWNER);
+	public SpawnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
+		this.inventory = this.createInventory();
+		this.inventory.addListener(this);
 	}
 
 	protected SimpleInventory createInventory() {
@@ -51,7 +51,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	}
 
 	@Override
-	public CompoundTag write(CompoundTag tag, UpdateType type) {
+	public NbtCompound write(NbtCompound tag, UpdateType type) {
 		tag.put("Inventory", this.getInventory().writeToNBT());
 		tag.put("Manager", this.manager.writeToNBT());
 		tag.put("Offset", NbtHelper.fromBlockPos(this.offset));
@@ -59,7 +59,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 	}
 
 	@Override
-	public void read(BlockState state, CompoundTag tag, UpdateType type) {
+	public void read(NbtCompound tag, UpdateType type) {
 		if(tag.contains("Inventory", NBTConstants.COMPOUND)) {
 			this.getInventory().readFromNBT(tag.getCompound("Inventory"));
 		}
@@ -71,10 +71,9 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		this.offset = NbtHelper.toBlockPos(tag.getCompound("Offset"));
 	}
 
-	@Override
-	public void tick() {
-		if(this.getWorld() == null || this.getWorld().isClient())return;
-		this.manager.tick(this.getWorld(), this.getWorld().getRandom(), this);
+	public static void tick(World world, BlockPos pos, BlockState state, SpawnerBlockEntity spawner) {
+		if(world == null || world.isClient())return;
+		spawner.manager.tick(world, world.getRandom(), spawner);
 	}
 
 	@Override
@@ -144,11 +143,6 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements Tickable, Nam
 		}
 
 		return null;
-	}
-
-	@Override
-	public double getSquaredRenderDistance() {
-		return 1024.0D;
 	}
 
 }

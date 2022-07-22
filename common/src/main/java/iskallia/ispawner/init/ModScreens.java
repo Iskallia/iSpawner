@@ -1,8 +1,8 @@
 package iskallia.ispawner.init;
 
+import dev.architectury.registry.menu.MenuRegistry;
 import iskallia.ispawner.screen.SpawnerScreen;
 import iskallia.ispawner.screen.SurvivalSpawnerScreen;
-import me.shedaniel.architectury.registry.MenuRegistry;
 
 public class ModScreens extends ModRegistries {
 

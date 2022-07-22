@@ -1,7 +1,7 @@
 package iskallia.ispawner.forge;
 
+import dev.architectury.platform.forge.EventBuses;
 import iskallia.ispawner.ISpawner;
-import me.shedaniel.architectury.platform.forge.EventBuses;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 

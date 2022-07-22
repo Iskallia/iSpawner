@@ -8,8 +8,8 @@ import iskallia.ispawner.util.WeightedList;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-public class SpawnerManager implements INBTSerializable<CompoundTag> {
+public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 	public WeightedList<SpawnerAction> actions = new WeightedList<>();
 	public SpawnerSettings settings = new SpawnerSettings();
@@ -83,10 +83,7 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 
 		Map<SpawnGroup, Integer> entityMap = new HashMap<>();
 
-		BlockBox spawnerBox = BlockBox.create(
-			pos.getX(), pos.getY(), pos.getZ(),
-			pos.getX(), pos.getY(), pos.getZ()
-		);
+		BlockBox spawnerBox = BlockBox.create(pos, pos);
 
 		world.getOtherEntities(null, Box.from(spawnerBox).expand(this.settings.getCheckRadius())).forEach(e -> {
 			SpawnGroup spawnGroup = e.getType().getSpawnGroup();
@@ -117,12 +114,12 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 	}
 
 	@Override
-	public CompoundTag writeToNBT() {
-		CompoundTag nbt = new CompoundTag();
-		ListTag actionsList = new ListTag();
+	public NbtCompound writeToNBT() {
+		NbtCompound nbt = new NbtCompound();
+		NbtList actionsList = new NbtList();
 
 		this.actions.forEach(entry -> {
-			CompoundTag tag = new CompoundTag();
+			NbtCompound tag = new NbtCompound();
 			tag.put("Action", entry.value.writeToNBT());
 			tag.putInt("Weight", entry.weight);
 			actionsList.add(tag);
@@ -134,9 +131,9 @@ public class SpawnerManager implements INBTSerializable<CompoundTag> {
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbt) {
+	public void readFromNBT(NbtCompound nbt) {
 		this.actions.clear();
-		ListTag actionsList = nbt.getList("Actions", NBTConstants.COMPOUND);
+		NbtList actionsList = nbt.getList("Actions", NBTConstants.COMPOUND);
 
 		IntStream.range(0, actionsList.size()).mapToObj(actionsList::getCompound).forEach(tag -> {
 			SpawnerAction action = new SpawnerAction();

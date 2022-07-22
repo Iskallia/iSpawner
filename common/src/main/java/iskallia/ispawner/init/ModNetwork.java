@@ -1,20 +1,20 @@
 package iskallia.ispawner.init;
 
+import dev.architectury.networking.NetworkChannel;
+import dev.architectury.networking.NetworkManager;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import iskallia.ispawner.ISpawner;
 import iskallia.ispawner.net.packet.*;
-import me.shedaniel.architectury.networking.NetworkChannel;
-import me.shedaniel.architectury.networking.NetworkManager;
-import me.shedaniel.architectury.platform.Platform;
-import me.shedaniel.architectury.utils.Env;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.io.IOException;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class ModNetwork extends ModRegistries {
 
@@ -59,17 +59,9 @@ public class ModNetwork extends ModRegistries {
 		}
 	}
 
-	public static <R extends PacketListener, T extends ModPacket<R>> void register(Class<T> type, Supplier<T> packetSupplier,
+	public static <R extends PacketListener, T extends ModPacket<R>> void register(Class<T> type, Function<PacketByteBuf, T> packetSupplier,
 	                                                                               Function<NetworkManager.PacketContext, R> contextMapper) {
-		CHANNEL.register(type, (packet, buf) -> {
-			try { packet.write(buf); }
-			catch(IOException e) { e.printStackTrace(); }
-		}, buf -> {
-			T packet = packetSupplier.get();
-			try { packet.read(buf); }
-			catch(IOException e) { e.printStackTrace(); }
-			return packet;
-		}, (packet, contextSupplier) -> {
+		CHANNEL.register(type, Packet::write, packetSupplier, (packet, contextSupplier) -> {
 			if(contextMapper != null) {
 				packet.apply(contextMapper.apply(contextSupplier.get()));
 			}

@@ -13,8 +13,9 @@ public class UpdateControllerC2SPacket implements ModPacket<ServerPlayNetworkHan
 	protected BlockPos target;
 	protected SpawnerController.Mode mode;
 
-	public UpdateControllerC2SPacket() {
-
+	public UpdateControllerC2SPacket(PacketByteBuf buf) {
+		this.target = buf.readBoolean() ? BlockPos.fromLong(buf.readLong()) : null;
+		this.mode = SpawnerController.Mode.values()[buf.readVarInt()];
 	}
 
 	public UpdateControllerC2SPacket(SpawnerController controller) {
@@ -31,12 +32,6 @@ public class UpdateControllerC2SPacket implements ModPacket<ServerPlayNetworkHan
 	}
 
 	@Override
-	public void read(PacketByteBuf buf) {
-		this.target = buf.readBoolean() ? BlockPos.fromLong(buf.readLong()) : null;
-		this.mode = SpawnerController.Mode.values()[buf.readVarInt()];
-	}
-
-	@Override
 	public void write(PacketByteBuf buf) {
 		buf.writeBoolean(this.target != null);
 		if(this.target != null)buf.writeLong(this.target.asLong());
@@ -48,7 +43,7 @@ public class UpdateControllerC2SPacket implements ModPacket<ServerPlayNetworkHan
 		ItemStack stack = listener.player.getStackInHand(Hand.MAIN_HAND);
 		if(stack.getItem() != ModItems.SPAWNER_CONTROLLER)return;
 
-		SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
+		SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 		controller.setTarget(this.getTarget());
 		controller.setMode(this.getMode());
 	}

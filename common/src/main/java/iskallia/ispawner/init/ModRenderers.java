@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 
 import java.util.Map;
@@ -18,9 +17,9 @@ public class ModRenderers extends ModRegistries {
 		public static SpawnerBlockRenderer<SpawnerBlockEntity> SPAWNER;
 		public static SpawnerBlockRenderer<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
-		public static void register(Map<BlockEntityType<?>, BlockEntityRenderer<?>> registry, BlockEntityRenderDispatcher dispatcher) {
-			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, new SpawnerBlockRenderer<>(dispatcher));
-			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, new SpawnerBlockRenderer<>(dispatcher));
+		public static void register(Map<BlockEntityType<?>, BlockEntityRenderer<?>> registry) {
+			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, new SpawnerBlockRenderer<>());
+			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, new SpawnerBlockRenderer<>());
 		}
 	}
 

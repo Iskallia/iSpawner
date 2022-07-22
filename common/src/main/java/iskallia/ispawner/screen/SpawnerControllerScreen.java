@@ -57,12 +57,12 @@ public class SpawnerControllerScreen extends Screen {
 	}
 
 	@Override
-	public boolean isPauseScreen() {
+	public boolean shouldPause() {
 		return false;
 	}
 
 	public ButtonWidget addCenteredButton(int x, int y, int width, int height, String text, ButtonWidget.PressAction action) {
-		return this.addButton(new ButtonWidget(this.width / 2 - width / 2 + x, this.height / 2 - height / 2 + y,
+		return this.addDrawable(new ButtonWidget(this.width / 2 - width / 2 + x, this.height / 2 - height / 2 + y,
 				width, height, new LiteralText(text), action));
 	}
 

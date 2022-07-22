@@ -1,16 +1,16 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.nbt.NBTConstants;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Optional;
 
 public class SpawnerController {
 
-	private final CompoundTag delegate;
+	private final NbtCompound delegate;
 
-	public SpawnerController(CompoundTag delegate) {
+	public SpawnerController(NbtCompound delegate) {
 		this.delegate = delegate;
 	}
 

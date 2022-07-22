@@ -1,8 +1,8 @@
 package iskallia.ispawner.init;
 
+import dev.architectury.registry.menu.MenuRegistry;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
-import me.shedaniel.architectury.registry.MenuRegistry;
 import net.minecraft.screen.ScreenHandlerType;
 
 public class ModMenus extends ModRegistries {
@@ -11,7 +11,7 @@ public class ModMenus extends ModRegistries {
 	public static ScreenHandlerType<SurvivalSpawnerScreenHandler> SURVIVAL_SPAWNER;
 
 	public static void register() {
-		SPAWNER = ModScreens.register(SCREEN_HANDLERS, "spawner", MenuRegistry.of(SpawnerScreenHandler::new));
+		SPAWNER = ModScreens.register(SCREEN_HANDLERS, "spawner", MenuRegistry.ofExtended(SpawnerScreenHandler::new));
 		SURVIVAL_SPAWNER = ModScreens.register(SCREEN_HANDLERS, "survival_spawner", MenuRegistry.ofExtended(SurvivalSpawnerScreenHandler::new));
 	}
 

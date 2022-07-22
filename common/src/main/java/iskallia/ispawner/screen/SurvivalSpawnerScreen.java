@@ -4,19 +4,16 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import iskallia.ispawner.ISpawner;
 import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.init.ModNetwork;
-import iskallia.ispawner.net.packet.UpdateControllerC2SPacket;
 import iskallia.ispawner.net.packet.UpdateRedstoneModeC2SPacket;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -25,6 +22,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3f;
 
 public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHandler> {
 
@@ -47,7 +45,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 	}
 
 	private void refreshButtons() {
-		this.addButton(new TexturedButtonWidget(this.x + 46, this.y + 123, 22, 22,
+		this.addDrawable(new TexturedButtonWidget(this.x + 46, this.y + 123, 22, 22,
 				212, this.lastKnownMode == SpawnerSettings.Mode.ALWAYS_ON ? 66 : 88, this.lastKnownMode == SpawnerSettings.Mode.ALWAYS_ON ? 44 : 22,
 				TEXTURE, 256, 256, btn -> {
 			if (this.lastKnownMode != SpawnerSettings.Mode.ALWAYS_ON) {
@@ -56,7 +54,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 		}, (btn, matrices, mouseX, mouseY) -> {
 			this.renderTooltip(matrices, new LiteralText(SpawnerSettings.Mode.ALWAYS_ON.text), mouseX, mouseY);
 		}, LiteralText.EMPTY));
-		this.addButton(new TexturedButtonWidget(this.x + 70, this.y + 123, 22, 22,
+		this.addDrawable(new TexturedButtonWidget(this.x + 70, this.y + 123, 22, 22,
 				234, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 66 : 88, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 44 : 22,
 				TEXTURE, 256, 256, btn -> {
 			if (this.lastKnownMode != SpawnerSettings.Mode.REDSTONE_ON) {
@@ -68,8 +66,8 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void handledScreenTick() {
+		super.handledScreenTick();
 
 		SurvivalSpawnerBlockEntity spawner = this.getScreenHandler().getSpawner();
 		if (spawner != null) {
@@ -104,9 +102,9 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 			matrices.translate(0, 0, -200);
 			matrices.scale(scale, scale, scale);
 
-			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(30));
-			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(135));
-			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(180));
+			matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(30));
+			matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(135));
+			matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(180));
 
 			try {
 				this.renderSpawningEntity(matrices, spawningEntity);
@@ -131,7 +129,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 	}
 
 	@Override
-	public boolean isPauseScreen() {
+	public boolean shouldPause() {
 		return false;
 	}
 
@@ -157,4 +155,5 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 		DiffuseLighting.enableGuiDepthLighting();
 		entityRenderer.setRenderShadows(true);
 	}
+
 }

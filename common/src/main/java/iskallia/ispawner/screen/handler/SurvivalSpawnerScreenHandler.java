@@ -117,7 +117,7 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 		//Survival spawner will always have an egg at index 0 if any slot
 		ItemStack stack = spawner.getInventory().getStack(0);
 		if (stack.getItem() instanceof SpawnEggItem) {
-			return ((SpawnEggItem) stack.getItem()).getEntityType(stack.getTag());
+			return ((SpawnEggItem) stack.getItem()).getEntityType(stack.getNbt());
 		}
 		return null;
 	}

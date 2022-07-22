@@ -1,9 +1,9 @@
 package iskallia.ispawner.init;
 
+import dev.architectury.platform.Platform;
+import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.utils.Env;
 import iskallia.ispawner.ISpawner;
-import me.shedaniel.architectury.platform.Platform;
-import me.shedaniel.architectury.registry.DeferredRegister;
-import me.shedaniel.architectury.utils.Env;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.Item;

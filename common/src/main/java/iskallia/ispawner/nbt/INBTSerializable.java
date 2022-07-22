@@ -1,8 +1,8 @@
 package iskallia.ispawner.nbt;
 
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtElement;
 
-public interface INBTSerializable<T extends Tag> {
+public interface INBTSerializable<T extends NbtElement> {
 
 	T writeToNBT();
 

@@ -3,7 +3,7 @@ package iskallia.ispawner.net.packet;
 import iskallia.ispawner.ISpawner;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
@@ -16,7 +16,7 @@ import java.io.*;
 public interface ModPacket<T extends PacketListener> extends Packet<T> {
 	void onReceived(T listener);
 
-	default void writeNBT(PacketByteBuf buf, CompoundTag nbt) throws IOException {
+	default void writeNBT(PacketByteBuf buf, NbtCompound nbt) throws IOException {
 		NbtIo.write(nbt, new DataOutputStream(new OutputStream() {
 			@Override
 			public void write(int b) {
@@ -25,7 +25,7 @@ public interface ModPacket<T extends PacketListener> extends Packet<T> {
 		}));
 	}
 
-	default CompoundTag readNBT(PacketByteBuf buf) throws IOException {
+	default NbtCompound readNBT(PacketByteBuf buf) throws IOException {
 		return NbtIo.read(new DataInputStream(new InputStream() {
 			@Override
 			public int read() {

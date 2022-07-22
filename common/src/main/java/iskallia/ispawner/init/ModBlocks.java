@@ -19,7 +19,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class ModBlocks extends ModRegistries {
 
@@ -86,27 +85,27 @@ public class ModBlocks extends ModRegistries {
 		return register(BLOCKS, name, block);
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, Supplier<T> blockEntity, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, BlockEntityType.BlockEntityFactory<T> blockEntity, Block... blocks) {
 		return register(id, blockEntity, Util.getChoiceType(TypeReferences.BLOCK_ENTITY, null), blocks);
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, Supplier<T> blockEntity, String typeId, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, BlockEntityType.BlockEntityFactory<T>blockEntity, String typeId, Block... blocks) {
 		return register(id, blockEntity, Util.getChoiceType(TypeReferences.BLOCK_ENTITY, typeId), blocks);
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, Supplier<T> blockEntity, Type<?> type, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(Identifier id, BlockEntityType.BlockEntityFactory<T> blockEntity, Type<?> type, Block... blocks) {
 		return register(BLOCK_ENTITY_TYPES, id, BlockEntityType.Builder.create(blockEntity, blocks).build(type));
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(String name, Supplier<T> blockEntity, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType.BlockEntityFactory<T> blockEntity, Block... blocks) {
 		return register(name, blockEntity, (Type<?>)null, blocks);
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(String name, Supplier<T> blockEntity, String typeId, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType.BlockEntityFactory<T> blockEntity, String typeId, Block... blocks) {
 		return register(name, blockEntity, Util.getChoiceType(TypeReferences.BLOCK_ENTITY, typeId), blocks);
 	}
 
-	public static <T extends BlockEntity> BlockEntityType<T> register(String name, Supplier<T> blockEntity, Type<?> type, Block... blocks) {
+	public static <T extends BlockEntity> BlockEntityType<T> register(String name, BlockEntityType.BlockEntityFactory<T> blockEntity, Type<?> type, Block... blocks) {
 		return register(BLOCK_ENTITY_TYPES, name, BlockEntityType.Builder.create(blockEntity, blocks).build(type));
 	}
 

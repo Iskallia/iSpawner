@@ -33,7 +33,7 @@ public class SpawnerControllerItem extends Item {
 	public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity player) {
 		if(!world.isClient) {
 			ItemStack stack = player.getStackInHand(Hand.MAIN_HAND);
-			SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
+			SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 			BlockHitResult context = raycast(world, player, RaycastContext.FluidHandling.NONE);
 
 			if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
@@ -67,7 +67,7 @@ public class SpawnerControllerItem extends Item {
 			return ActionResult.SUCCESS;
 		}
 
-		SpawnerController controller = new SpawnerController(context.getStack().getOrCreateSubTag("Controller"));
+		SpawnerController controller = new SpawnerController(context.getStack().getOrCreateSubNbt("Controller"));
 
 		if(state.getBlock() instanceof SpawnerBlock && !context.getBlockPos().equals(controller.getTarget().orElse(null))) {
 			controller.setTarget(context.getBlockPos());
@@ -110,7 +110,7 @@ public class SpawnerControllerItem extends Item {
 	@Override
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
-		SpawnerController controller = new SpawnerController(stack.getOrCreateSubTag("Controller"));
+		SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 
 		if(player.isSneaking()) {
 			if(world.isClient) {
@@ -132,7 +132,7 @@ public class SpawnerControllerItem extends Item {
 
 	@Environment(EnvType.CLIENT)
 	public void openScreen(SpawnerController controller) {
-		MinecraftClient.getInstance().openScreen(new SpawnerControllerScreen(new LiteralText("Spawner Controller"), controller));
+		MinecraftClient.getInstance().setScreenAndRender(new SpawnerControllerScreen(new LiteralText("Spawner Controller"), controller));
 	}
 
 }

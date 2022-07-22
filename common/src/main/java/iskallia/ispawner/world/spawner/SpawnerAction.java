@@ -13,7 +13,7 @@ import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.ThrowablePotionItem;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
@@ -26,7 +26,7 @@ import net.minecraft.world.World;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class SpawnerAction implements INBTSerializable<CompoundTag> {
+public class SpawnerAction implements INBTSerializable<NbtCompound> {
 
 	protected BlockPos pos;
 	protected Direction side;
@@ -99,8 +99,8 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 	}
 
 	@Override
-	public CompoundTag writeToNBT() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound writeToNBT() {
+		NbtCompound nbt = new NbtCompound();
 		nbt.putLong("Pos", this.getPos().asLong());
 		nbt.putInt("Side", this.getSide().ordinal());
 		nbt.putDouble("HitPosX", this.getHitPos().x);
@@ -112,7 +112,7 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbt) {
+	public void readFromNBT(NbtCompound nbt) {
 		this.pos = BlockPos.fromLong(nbt.getLong("Pos"));
 		this.side = Direction.values()[nbt.getInt("Side")];
 		this.hitPos = new Vec3d(nbt.getDouble("HitPosX"), nbt.getDouble("HitPosY"), nbt.getDouble("HitPosZ"));
@@ -129,7 +129,7 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 
 	public boolean applyEggOverride(World world, ItemStack stack) {
 		BlockState blockState = world.getBlockState(this.getPos());
-		EntityType<?> entityType = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getTag());
+		EntityType<?> entityType = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
 
 		if(blockState.isOf(Blocks.SPAWNER)) {
 			BlockEntity blockEntity = world.getBlockEntity(this.getPos());
@@ -152,9 +152,9 @@ public class SpawnerAction implements INBTSerializable<CompoundTag> {
 			blockPos3 = this.getPos().offset(this.getSide());
 		}
 
-		EntityType<?> entityType2 = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getTag());
+		EntityType<?> entityType2 = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
 
-		Entity entity = entityType2.create((ServerWorld)world, stack.getTag(), stack.hasCustomName() ? stack.getName() : null, null, blockPos3,
+		Entity entity = entityType2.create((ServerWorld)world, stack.getNbt(), stack.hasCustomName() ? stack.getName() : null, null, blockPos3,
 			SpawnReason.SPAWN_EGG, true, !Objects.equals(this.getPos(), blockPos3) && this.getSide() == Direction.UP);
 
 		boolean isMob = entity instanceof MobEntity;

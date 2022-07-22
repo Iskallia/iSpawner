@@ -21,7 +21,7 @@ public abstract class MixinBlockEntityRenderDispatcher {
 	@Inject(method = "<init>",
 			at = @At("RETURN"))
 	private void ctor(CallbackInfo ci) {
-		ModRenderers.BlockEntities.register(this.renderers, (BlockEntityRenderDispatcher)(Object)this);
+		ModRenderers.BlockEntities.register(this.renderers);
 	}
 
 }

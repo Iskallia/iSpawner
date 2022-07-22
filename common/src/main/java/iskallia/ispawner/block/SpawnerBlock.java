@@ -1,11 +1,14 @@
 package iskallia.ispawner.block;
 
+import dev.architectury.registry.menu.MenuRegistry;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModItems;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
-import me.shedaniel.architectury.registry.MenuRegistry;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
@@ -24,7 +27,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
@@ -85,8 +87,13 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 	}
 
 	@Override
-	public BlockEntity createBlockEntity(BlockView world) {
-		return new SpawnerBlockEntity();
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new SpawnerBlockEntity(pos, state);
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+		return checkType(type, ModBlocks.Entities.SPAWNER, SpawnerBlockEntity::tick);
 	}
 
 	@Override

@@ -7,8 +7,8 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FixedInventory implements SidedInventory, INBTSerializable<CompoundTag> {
+public abstract class FixedInventory implements SidedInventory, INBTSerializable<NbtCompound> {
 
 	protected DefaultedList<ItemStack> stacks;
 	protected Map<Direction, int[]> availableSlots;
@@ -110,19 +110,19 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 	}
 
 	@Override
-	public CompoundTag writeToNBT() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound writeToNBT() {
+		NbtCompound nbt = new NbtCompound();
 
-		ListTag stacksList = new ListTag();
+		NbtList stacksList = new NbtList();
 		this.stacks.forEach(stack -> {
 			stacksList.add(this.getStackNBT(stack));
 		});
 
 		nbt.put("Stacks", stacksList);
 
-		ListTag slotsList = new ListTag();
+		NbtList slotsList = new NbtList();
 		this.availableSlots.forEach((direction, slots) -> {
-			CompoundTag tag = new CompoundTag();
+			NbtCompound tag = new NbtCompound();
 			tag.putInt("Direction", direction.ordinal());
 			tag.putIntArray("Slots", slots);
 			slotsList.add(tag);
@@ -133,40 +133,40 @@ public abstract class FixedInventory implements SidedInventory, INBTSerializable
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbt) {
+	public void readFromNBT(NbtCompound nbt) {
 		this.stacks.clear();
 		this.availableSlots.clear();
 
-		ListTag stacksList = nbt.getList("Stacks", NBTConstants.COMPOUND);
+		NbtList stacksList = nbt.getList("Stacks", NBTConstants.COMPOUND);
 
 		for(int i = 0; i < stacksList.size() && i < this.stacks.size(); i++) {
 			this.stacks.set(i, this.getStackFromNBT(stacksList.getCompound(i)));
 		}
 
-		ListTag slotsList = nbt.getList("AvailableSlots", NBTConstants.COMPOUND);
+		NbtList slotsList = nbt.getList("AvailableSlots", NBTConstants.COMPOUND);
 
 		for(int i = 0; i < slotsList.size(); i++) {
-			CompoundTag tag = slotsList.getCompound(i);
+			NbtCompound tag = slotsList.getCompound(i);
 			Direction direction = Direction.values()[tag.getInt("Direction")];
 			int[] slots = tag.getIntArray("Slots");
 			this.availableSlots.put(direction, slots);
 		}
 	}
 
-	protected CompoundTag getStackNBT(ItemStack stack) {
-		CompoundTag tag = new CompoundTag();
+	protected NbtCompound getStackNBT(ItemStack stack) {
+		NbtCompound tag = new NbtCompound();
 		tag.putString("id", Registry.ITEM.getId(stack.getItem()).toString());
 		tag.putInt("Count", stack.getCount());
 
-		if(stack.getTag() != null) {
-			tag.put("tag", stack.getTag().copy());
+		if(stack.getNbt() != null) {
+			tag.put("tag", stack.getNbt().copy());
 		}
 
 		return tag;
 	}
 
-	protected ItemStack getStackFromNBT(CompoundTag tag) {
-		ItemStack stack = ItemStack.fromTag(tag);
+	protected ItemStack getStackFromNBT(NbtCompound tag) {
+		ItemStack stack = ItemStack.fromNbt(tag);
 		stack.setCount(tag.getInt("Count"));
 		return stack;
 	}

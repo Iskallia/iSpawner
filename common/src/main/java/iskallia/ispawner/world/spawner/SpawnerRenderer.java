@@ -6,12 +6,8 @@ import iskallia.ispawner.util.Color;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
 import net.minecraft.text.LiteralText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.*;
 
 import java.util.*;
 
@@ -58,27 +54,27 @@ public class SpawnerRenderer {
 			if(this.side == Direction.UP) {
 				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() + center - 0.5D / 16.0D, p.getY() + 1.01D, p.getZ() + 11.5D / 16.0D);
-				matrices.multiply(new Quaternion(new Vector3f(1.0F, 0.0F, 0.0F), 90.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(1.0F, 0.0F, 0.0F), 90.0F, true));
 			} else if(this.side == Direction.DOWN) {
 				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() + center - 0.5D / 16.0D, p.getY() - 0.01D, p.getZ() + 4.5D / 16.0D);
-				matrices.multiply(new Quaternion(new Vector3f(1.0F, 0.0F, 0.0F), -90.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(1.0F, 0.0F, 0.0F), -90.0F, true));
 			} else if(this.side == Direction.NORTH) {
 				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() + center - 0.5D / 16.0D, p.getY() + 11.5D / 16.0D, p.getZ() - 0.01D);
-				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 0.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(0.0F, 1.0F, 0.0F), 0.0F, true));
 			} else if(this.side == Direction.SOUTH) {
 				double center = (8.0D - MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() + center + 0.5D / 16.0D, p.getY() + 11.5D / 16.0D, p.getZ() + 1.01D);
-				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 180.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(0.0F, 1.0F, 0.0F), 180.0F, true));
 			} else if(this.side == Direction.WEST) {
 				double center = (8.0D - MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() - 0.01D, p.getY() + 11.5D / 16.0D, p.getZ() + center + 0.5D / 16.0D);
-				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), 90.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(0.0F, 1.0F, 0.0F), 90.0F, true));
 			} else if(this.side == Direction.EAST) {
 				double center = (8.0D + MinecraftClient.getInstance().textRenderer.getWidth(String.valueOf(this.weight)) / 2.0D) / 16.0D;
 				matrices.translate(p.getX() + 1.01D, p.getY() + 11.5D / 16.0D, p.getZ() + center - 0.5D / 16.0D);
-				matrices.multiply(new Quaternion(new Vector3f(0.0F, 1.0F, 0.0F), -90.0F, true));
+				matrices.multiply(new Quaternion(new Vec3f(0.0F, 1.0F, 0.0F), -90.0F, true));
 			}
 
 			matrices.scale(-0.0625F, -0.0625F, 0.0625F);

@@ -57,7 +57,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 	@Override
 	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
 		this.textRenderer.draw(matrices, this.title, (float)this.titleX + 110, (float)this.titleY, 4210752);
-		this.textRenderer.draw(matrices, this.playerInventory.getDisplayName(), (float)this.playerInventoryTitleX + 110, (float)this.playerInventoryTitleY, 4210752);
+		this.textRenderer.draw(matrices, this.playerInventoryTitle, (float)this.playerInventoryTitleX + 110, (float)this.playerInventoryTitleY, 4210752);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 		int offset = 2;
 
-		this.attemptsSlider = this.addButton(new Slider(40, offset, 160, 20, LiteralText.EMPTY,
+		this.attemptsSlider = this.addDrawable(new Slider(40, offset, 160, 20, LiteralText.EMPTY,
 				0.0D, "Attempts: ", 0.0D, 32.0D, i -> this.settings.setAttempts(i)));
 
 		this.spawnDelayTextField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,
@@ -83,9 +83,9 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 			}
 		});
 
-		this.addButton(this.spawnDelayTextField);
+		this.addDrawable(this.spawnDelayTextField);
 
-		this.modeButton = this.addButton(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
+		this.modeButton = this.addDrawable(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
 				button -> {
 					if(SpawnerScreen.this.settings != null) {
 						SpawnerSettings.Mode[] modes = SpawnerSettings.Mode.values();
@@ -106,7 +106,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 			String prefix = String.join(" ", parts);
 
-			Slider spawnField = this.addButton(new Slider(40, offset + 80 + i * 20, 160, 20, LiteralText.EMPTY,
+			Slider spawnField = this.addDrawable(new Slider(40, offset + 80 + i * 20, 160, 20, LiteralText.EMPTY,
 					0.0D, prefix + " Cap: ", 0.0D, 32.0D, j -> {
 				this.settings.getCapRestrictions().get(spawnGroup).limit = j;
 			}));
@@ -114,10 +114,10 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 			this.spawnGroupTextFields.put(spawnGroup, spawnField);
 		}
 
-		this.checkRangeSlider = this.addButton(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 10, 160, 20, LiteralText.EMPTY,
+		this.checkRangeSlider = this.addDrawable(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 10, 160, 20, LiteralText.EMPTY,
 			0.0D, "Check Radius: ", 0.0D, 128.0D, i -> this.settings.setCheckRadius(i)));
 
-		this.playerRangeSlider = this.addButton(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 30, 160, 20, LiteralText.EMPTY,
+		this.playerRangeSlider = this.addDrawable(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 30, 160, 20, LiteralText.EMPTY,
 			0.0D, "Player Radius: ", 0.0D, 128.0D, i -> this.settings.setPlayerRadius(i)));
 	}
 

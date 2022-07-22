@@ -1,5 +1,6 @@
 package iskallia.ispawner.block.entity;
 
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.inventory.SimpleInventory;
@@ -8,12 +9,12 @@ import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerAction;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
-import me.shedaniel.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.BlockRotation;
@@ -21,6 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
@@ -34,8 +36,12 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 		}
 	};
 
-	public SurvivalSpawnerBlockEntity() {
-		super(ModBlocks.Entities.SURVIVAL_SPAWNER);
+	public SurvivalSpawnerBlockEntity(BlockPos pos, BlockState state) {
+		this(ModBlocks.Entities.SURVIVAL_SPAWNER, pos, state);
+	}
+
+	public SurvivalSpawnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		this.input.addListener(this);
 	}
 
@@ -43,46 +49,43 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 		return this.input;
 	}
 
-	@Override
-	public void tick() {
-		super.tick();
-
+	public static void tick(World world, BlockPos pos, BlockState state, SurvivalSpawnerBlockEntity spawner) {
 		SpawnerSettings newConfig = ModConfigs.SURVIVAL_SPAWNER.defaultSettings.copy();
-		newConfig.setMode(this.manager.settings.getMode());
+		newConfig.setMode(spawner.manager.settings.getMode());
 
-		if(!this.manager.settings.equals(newConfig)) {
-			this.manager.settings = newConfig;
-			this.sendClientUpdates();
+		if(!spawner.manager.settings.equals(newConfig)) {
+			spawner.manager.settings = newConfig;
+			spawner.sendClientUpdates();
 		}
 
-		if (this.inventory.isEmpty()) {
-			for (int i = 0; i < this.input.size(); i++) {
-				ItemStack stack = this.input.getStack(i);
+		if (spawner.inventory.isEmpty()) {
+			for (int i = 0; i < spawner.input.size(); i++) {
+				ItemStack stack = spawner.input.getStack(i);
 				if (stack.isEmpty()) continue;
-				if (!this.input.canInsert(i, stack, Direction.NORTH)) continue;
+				if (!spawner.input.canInsert(i, stack, Direction.NORTH)) continue;
 
-				OptionalInt emptySlot = this.inventory.getEmptySlot();
+				OptionalInt emptySlot = spawner.inventory.getEmptySlot();
 
 				if (emptySlot.isPresent()) {
 					ItemStack newStack = new ItemStack(stack.getItem());
 					newStack.setCount(new SpawnData(stack).getCharges());
-					this.inventory.setStack(emptySlot.getAsInt(), newStack);
+					spawner.inventory.setStack(emptySlot.getAsInt(), newStack);
 					stack.decrement(1);
-					this.input.setStack(i, stack);
+					spawner.input.setStack(i, stack);
 					break;
 				}
 			}
 		}
 
-		if(this.manager.actions.isEmpty()) {
+		if(spawner.manager.actions.isEmpty()) {
 			for(int x = -4; x <= 4; x++) {
 				for(int z = -4; z <= 4; z++) {
 					for(int y = -2; y <= 1; y++) {
 						int weight = 4 - Math.max(Math.abs(x), Math.abs(z)) + 1;
-						BlockRotation rotation = this.getReverseRotation();
+						BlockRotation rotation = spawner.getReverseRotation();
 						Vec3d hitPosOffset = new Vec3d(0.5D, 1.0D, 0.5D);
 
-						this.manager.addAction(new SpawnerAction(
+						spawner.manager.addAction(new SpawnerAction(
 							new BlockPos(x, y, z).rotate(rotation),
 							rotation.rotate(Direction.UP),
 							SpawnerAction.rotate(rotation, hitPosOffset),
@@ -111,15 +114,15 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 	}
 
 	@Override
-	public CompoundTag write(CompoundTag tag, UpdateType type) {
-		CompoundTag nbt = super.write(tag, type);
+	public NbtCompound write(NbtCompound tag, UpdateType type) {
+		NbtCompound nbt = super.write(tag, type);
 		nbt.put("Input", this.input.writeToNBT());
 		return nbt;
 	}
 
 	@Override
-	public void read(BlockState state, CompoundTag tag, UpdateType type) {
-		super.read(state, tag, type);
+	public void read(NbtCompound tag, UpdateType type) {
+		super.read(tag, type);
 
 		if(tag.contains("Input", NBTConstants.COMPOUND)) {
 			this.input.readFromNBT(tag.getCompound("Input"));

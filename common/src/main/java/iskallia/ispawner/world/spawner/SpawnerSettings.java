@@ -5,8 +5,8 @@ import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.net.packet.IByteSerializable;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Util;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBTSerializable<CompoundTag> {
+public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBTSerializable<NbtCompound> {
 
 	@Expose protected int attempts = 4;
 	@Expose protected int spawnDelay = 500;
@@ -115,13 +115,13 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 	}
 
 	@Override
-	public CompoundTag writeToNBT() {
-		CompoundTag nbt = new CompoundTag();
+	public NbtCompound writeToNBT() {
+		NbtCompound nbt = new NbtCompound();
 		nbt.putInt("Attempts", this.getAttempts());
 		nbt.putInt("SpawnDelay", this.getSpawnDelay());
 		nbt.putInt("Mode", this.getMode().ordinal());
 
-		ListTag capList = new ListTag();
+		NbtList capList = new NbtList();
 		this.getCapRestrictions().values().forEach(cap -> {
 			capList.add(cap.writeToNBT());
 		});
@@ -133,14 +133,14 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 	}
 
 	@Override
-	public void readFromNBT(CompoundTag nbt) {
+	public void readFromNBT(NbtCompound nbt) {
 		this.setAttempts(nbt.getInt("Attempts"));
 		this.setSpawnDelay(nbt.getInt("SpawnDelay"));
 		this.setMode(nbt.getInt("Mode"));
 
-		ListTag capList = nbt.getList("CapRestrictions", NBTConstants.COMPOUND);
+		NbtList capList = nbt.getList("CapRestrictions", NBTConstants.COMPOUND);
 
-		capList.stream().map(tag -> (CompoundTag)tag).forEach(cap -> {
+		capList.stream().map(tag -> (NbtCompound)tag).forEach(cap -> {
 			CapRestriction capRestriction = new CapRestriction(null, 0);
 			capRestriction.readFromNBT(cap);
 			this.getCapRestrictions().put(capRestriction.spawnGroup, capRestriction);
@@ -195,7 +195,7 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		}
 	}
 
-	public static class CapRestriction implements INBTSerializable<CompoundTag> {
+	public static class CapRestriction implements INBTSerializable<NbtCompound> {
 		@Expose protected SpawnGroup spawnGroup;
 		@Expose public int limit;
 
@@ -205,15 +205,15 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		}
 
 		@Override
-		public CompoundTag writeToNBT() {
-			CompoundTag nbt = new CompoundTag();
+		public NbtCompound writeToNBT() {
+			NbtCompound nbt = new NbtCompound();
 			nbt.putInt("SpawnGroup", this.spawnGroup.ordinal());
 			nbt.putInt("Limit", this.limit);
 			return nbt;
 		}
 
 		@Override
-		public void readFromNBT(CompoundTag nbt) {
+		public void readFromNBT(NbtCompound nbt) {
 			this.spawnGroup = SpawnGroup.values()[nbt.getInt("SpawnGroup")];
 			this.limit = nbt.getInt("Limit");
 		}

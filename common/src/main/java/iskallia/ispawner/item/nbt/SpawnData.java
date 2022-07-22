@@ -4,7 +4,7 @@ import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.nbt.NBTConstants;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -23,7 +23,7 @@ public class SpawnData extends ItemNBT {
         super(stack, KEY);
     }
 
-    public SpawnData(CompoundTag delegate) {
+    public SpawnData(NbtCompound delegate) {
         super(delegate, KEY);
     }
 
@@ -37,14 +37,14 @@ public class SpawnData extends ItemNBT {
     }
 
     @Override
-    public CompoundTag writeToNBT() {
-        CompoundTag nbt = new CompoundTag();
+    public NbtCompound writeToNBT() {
+        NbtCompound nbt = new NbtCompound();
         nbt.putInt("Charges", this.charges);
         return nbt;
     }
 
     @Override
-    public void readFromNBT(CompoundTag nbt) {
+    public void readFromNBT(NbtCompound nbt) {
         if (nbt.contains("Charges", NBTConstants.INT)) {
             this.charges = nbt.getInt("Charges");
         } else {

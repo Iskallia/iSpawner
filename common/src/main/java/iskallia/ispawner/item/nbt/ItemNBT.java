@@ -5,7 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -16,24 +16,24 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class ItemNBT implements INBTSerializable<CompoundTag> {
+public abstract class ItemNBT implements INBTSerializable<NbtCompound> {
 
     public static final List<StackOverride> OVERRIDES = new ArrayList<>();
 
-    protected final CompoundTag delegate;
+    protected final NbtCompound delegate;
     protected final String tagKey;
 
     public ItemNBT(ItemStack stack, String tagKey) {
-        this(stack.getTag(), tagKey);
+        this(stack.getNbt(), tagKey);
     }
 
-    public ItemNBT(CompoundTag delegate, String tagKey) {
+    public ItemNBT(NbtCompound delegate, String tagKey) {
         this.delegate = delegate;
         this.tagKey = tagKey;
-        this.readFromNBT(this.getDelegate() != null ? this.getDelegate().getCompound(this.getTagKey()) : new CompoundTag());
+        this.readFromNBT(this.getDelegate() != null ? this.getDelegate().getCompound(this.getTagKey()) : new NbtCompound());
 	}
 
-    public CompoundTag getDelegate() {
+    public NbtCompound getDelegate() {
         return this.delegate;
     }
 
