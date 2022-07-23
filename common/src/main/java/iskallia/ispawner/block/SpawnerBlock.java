@@ -1,5 +1,6 @@
 package iskallia.ispawner.block;
 
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.init.ModBlocks;
@@ -14,7 +15,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -79,9 +79,10 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 	}
 
 	protected void openMenu(BlockState state, World world, BlockPos pos, ServerPlayerEntity player) {
-		NamedScreenHandlerFactory factory = this.createScreenHandlerFactory(state, world, pos);
-		if (factory != null) {
-			MenuRegistry.openMenu(player, factory);
+		BlockEntity be = world.getBlockEntity(pos);
+
+		if(be instanceof ExtendedMenuProvider) {
+			MenuRegistry.openExtendedMenu(player, (ExtendedMenuProvider)be);
 			PiglinBrain.onGuardedBlockInteracted(player, true);
 		}
 	}

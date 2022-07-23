@@ -66,28 +66,29 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 		ItemStack itemStack = ItemStack.EMPTY;
 		Slot slot = this.slots.get(index);
 
-		if (slot != null && slot.hasStack()) {
+		if(slot.hasStack()) {
 			ItemStack slotStack = slot.getStack();
 			itemStack = slotStack.copy();
 
-			if (index >= 0 && index < 36) {
+			if(index >= 0 && index < 36) {
 				if (this.insertItem(slotStack, 36, 37, false)) {
 					return itemStack;
 				}
 			}
-			if (index >= 0 && index < 27) {
+
+			if(index >= 0 && index < 27) {
 				if (!this.insertItem(slotStack, 27, 36, false)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (index >= 27 && index < 36) {
-				if (!this.insertItem(slotStack, 0, 27, false)) {
+			} else if(index >= 27 && index < 36) {
+				if(!this.insertItem(slotStack, 0, 27, false)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (!this.insertItem(slotStack, 0, 36, false)) {
+			} else if(!this.insertItem(slotStack, 0, 36, false)) {
 				return ItemStack.EMPTY;
 			}
 
-			if (slotStack.isEmpty()) {
+			if(slotStack.isEmpty()) {
 				slot.setStack(ItemStack.EMPTY);
 			} else {
 				slot.markDirty();
@@ -95,6 +96,7 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 
 			slot.onTakeItem(player, slotStack);
 		}
+
 		return itemStack;
 	}
 
@@ -111,22 +113,25 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 	@Nullable
 	public EntityType<?> getSpawningEntity() {
 		SurvivalSpawnerBlockEntity spawner = this.getSpawner();
-		if (spawner == null) {
-			return null;
-		}
+		if(spawner == null) return null;
+
 		//Survival spawner will always have an egg at index 0 if any slot
 		ItemStack stack = spawner.getInventory().getStack(0);
-		if (stack.getItem() instanceof SpawnEggItem) {
-			return ((SpawnEggItem) stack.getItem()).getEntityType(stack.getNbt());
+
+		if(stack.getItem() instanceof SpawnEggItem) {
+			return ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
 		}
+
 		return null;
 	}
 
 	public int getSpawnerCharges() {
 		SurvivalSpawnerBlockEntity spawner = this.getSpawner();
-		if (spawner == null) {
+
+		if(spawner == null) {
 			return -1;
 		}
+
 		ItemStack stack = spawner.getInventory().getStack(0);
 		return stack.getCount();
 	}
@@ -134,9 +139,11 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 	@Nullable
 	public SurvivalSpawnerBlockEntity getSpawner() {
 		BlockEntity be = this.playerInventory.player.getEntityWorld().getBlockEntity(this.spawnerPos);
-		if (!(be instanceof SurvivalSpawnerBlockEntity)) {
+
+		if(!(be instanceof SurvivalSpawnerBlockEntity)) {
 			return null;
 		}
+
 		return (SurvivalSpawnerBlockEntity) be;
 	}
 }

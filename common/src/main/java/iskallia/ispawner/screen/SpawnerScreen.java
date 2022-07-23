@@ -67,7 +67,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 		int offset = 2;
 
-		this.attemptsSlider = this.addDrawable(new Slider(40, offset, 160, 20, LiteralText.EMPTY,
+		this.attemptsSlider = this.addDrawableChild(new Slider(40, offset, 160, 20, LiteralText.EMPTY,
 				0.0D, "Attempts: ", 0.0D, 32.0D, i -> this.settings.setAttempts(i)));
 
 		this.spawnDelayTextField = new TextFieldWidget(MinecraftClient.getInstance().textRenderer,
@@ -86,7 +86,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 		this.addDrawable(this.spawnDelayTextField);
 
-		this.modeButton = this.addDrawable(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
+		this.modeButton = this.addDrawableChild(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
 				button -> {
 					if(SpawnerScreen.this.settings != null) {
 						SpawnerSettings.Mode[] modes = SpawnerSettings.Mode.values();
@@ -107,7 +107,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 
 			String prefix = String.join(" ", parts);
 
-			Slider spawnField = this.addDrawable(new Slider(40, offset + 80 + i * 20, 160, 20, LiteralText.EMPTY,
+			Slider spawnField = this.addDrawableChild(new Slider(40, offset + 80 + i * 20, 160, 20, LiteralText.EMPTY,
 					0.0D, prefix + " Cap: ", 0.0D, 32.0D, j -> {
 				this.settings.getCapRestrictions().get(spawnGroup).limit = j;
 			}));
@@ -115,10 +115,10 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 			this.spawnGroupTextFields.put(spawnGroup, spawnField);
 		}
 
-		this.checkRangeSlider = this.addDrawable(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 10, 160, 20, LiteralText.EMPTY,
+		this.checkRangeSlider = this.addDrawableChild(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 10, 160, 20, LiteralText.EMPTY,
 			0.0D, "Check Radius: ", 0.0D, 128.0D, i -> this.settings.setCheckRadius(i)));
 
-		this.playerRangeSlider = this.addDrawable(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 30, 160, 20, LiteralText.EMPTY,
+		this.playerRangeSlider = this.addDrawableChild(new Slider(40, offset + 80 + SpawnGroup.values().length * 20 + 30, 160, 20, LiteralText.EMPTY,
 			0.0D, "Player Radius: ", 0.0D, 128.0D, i -> this.settings.setPlayerRadius(i)));
 	}
 

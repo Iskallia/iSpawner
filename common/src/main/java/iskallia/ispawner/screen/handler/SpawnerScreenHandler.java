@@ -1,7 +1,6 @@
 package iskallia.ispawner.screen.handler;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
-import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.init.ModMenus;
 import iskallia.ispawner.init.ModNetwork;
 import iskallia.ispawner.inventory.SimpleInventory;
@@ -63,7 +62,7 @@ public class SpawnerScreenHandler extends ScreenHandler {
 	@Override
 	public void sendContentUpdates() {
 		super.sendContentUpdates();
-		SurvivalSpawnerBlockEntity spawner = this.getSpawner();
+		SpawnerBlockEntity spawner = this.getSpawner();
 
 		if(spawner != null && !spawner.getWorld().isClient && !this.sentSettings) {
 			ModNetwork.CHANNEL.sendToPlayer((ServerPlayerEntity)this.playerInventory.player,
@@ -73,12 +72,12 @@ public class SpawnerScreenHandler extends ScreenHandler {
 	}
 
 	@Nullable
-	public SurvivalSpawnerBlockEntity getSpawner() {
+	public SpawnerBlockEntity getSpawner() {
 		BlockEntity be = this.playerInventory.player.getEntityWorld().getBlockEntity(this.spawnerPos);
-		if (!(be instanceof SurvivalSpawnerBlockEntity)) {
+		if (!(be instanceof SpawnerBlockEntity)) {
 			return null;
 		}
-		return (SurvivalSpawnerBlockEntity) be;
+		return (SpawnerBlockEntity)be;
 	}
 
 	@Override

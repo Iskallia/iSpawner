@@ -46,7 +46,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 	}
 
 	private void refreshButtons() {
-		this.addDrawable(new TexturedButtonWidget(this.x + 46, this.y + 123, 22, 22,
+		this.addDrawableChild(new TexturedButtonWidget(this.x + 46, this.y + 123, 22, 22,
 				212, this.lastKnownMode == SpawnerSettings.Mode.ALWAYS_ON ? 66 : 88, this.lastKnownMode == SpawnerSettings.Mode.ALWAYS_ON ? 44 : 22,
 				TEXTURE, 256, 256, btn -> {
 			if (this.lastKnownMode != SpawnerSettings.Mode.ALWAYS_ON) {
@@ -55,7 +55,7 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 		}, (btn, matrices, mouseX, mouseY) -> {
 			this.renderTooltip(matrices, new LiteralText(SpawnerSettings.Mode.ALWAYS_ON.text), mouseX, mouseY);
 		}, LiteralText.EMPTY));
-		this.addDrawable(new TexturedButtonWidget(this.x + 70, this.y + 123, 22, 22,
+		this.addDrawableChild(new TexturedButtonWidget(this.x + 70, this.y + 123, 22, 22,
 				234, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 66 : 88, this.lastKnownMode == SpawnerSettings.Mode.REDSTONE_ON ? 44 : 22,
 				TEXTURE, 256, 256, btn -> {
 			if (this.lastKnownMode != SpawnerSettings.Mode.REDSTONE_ON) {
@@ -71,9 +71,11 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 		super.handledScreenTick();
 
 		SurvivalSpawnerBlockEntity spawner = this.getScreenHandler().getSpawner();
-		if (spawner != null) {
+
+		if(spawner != null) {
 			SpawnerSettings.Mode redstoneMode = spawner.manager.settings.getMode();
-			if (redstoneMode != this.lastKnownMode) {
+
+			if(redstoneMode != this.lastKnownMode) {
 				this.lastKnownMode = redstoneMode;
 				this.refreshButtons();
 			}
@@ -93,7 +95,8 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 
 		EntityType<?> spawningEntity = this.getScreenHandler().getSpawningEntity();
 		int charges = this.getScreenHandler().getSpawnerCharges();
-		if (spawningEntity != null && charges > 0) {
+
+		if(spawningEntity != null && charges > 0) {
 			EntityDimensions size = spawningEntity.getDimensions();
 			float scale = 1F / (Math.max(size.height, size.width) / 1.4F) * 32F;
 
@@ -109,7 +112,8 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 
 			try {
 				this.renderSpawningEntity(matrices, spawningEntity);
-			} catch (Exception ignored) {}
+			} catch(Exception ignored) {}
+
 			matrices.pop();
 
 			matrices.push();
@@ -138,8 +142,9 @@ public class SurvivalSpawnerScreen extends HandledScreen<SurvivalSpawnerScreenHa
 	private void renderSpawningEntity(MatrixStack renderStack, EntityType<?> entityType) {
 		EntityRenderDispatcher entityRenderer = MinecraftClient.getInstance().getEntityRenderDispatcher();
 		Entity entity = entityType.create(MinecraftClient.getInstance().world);
-		if (entity instanceof LivingEntity) {
-			((LivingEntity) entity).headYaw = 0;
+
+		if(entity instanceof LivingEntity) {
+			((LivingEntity)entity).headYaw = 0;
 		}
 
 		entityRenderer.setRenderShadows(false);

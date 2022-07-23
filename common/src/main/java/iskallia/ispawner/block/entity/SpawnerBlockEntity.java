@@ -1,5 +1,6 @@
 package iskallia.ispawner.block.entity;
 
+import dev.architectury.registry.menu.ExtendedMenuProvider;
 import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
@@ -16,6 +17,7 @@ import net.minecraft.inventory.InventoryChangedListener;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
@@ -25,7 +27,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
-public class SpawnerBlockEntity extends BaseBlockEntity implements NamedScreenHandlerFactory, InventoryChangedListener {
+public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuProvider, NamedScreenHandlerFactory, InventoryChangedListener {
 
 	public final SimpleInventory inventory;
 	public SpawnerManager manager = new SpawnerManager();
@@ -69,6 +71,11 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements NamedScreenHa
 		}
 
 		this.offset = NbtHelper.toBlockPos(tag.getCompound("Offset"));
+	}
+
+	@Override
+	public void saveExtraData(PacketByteBuf buf) {
+		buf.writeBlockPos(this.getPos());
 	}
 
 	public static void tick(World world, BlockPos pos, BlockState state, SpawnerBlockEntity spawner) {

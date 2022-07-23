@@ -1,6 +1,5 @@
 package iskallia.ispawner.block.entity;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.inventory.SimpleInventory;
@@ -15,7 +14,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
@@ -27,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.OptionalInt;
 
-public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements ExtendedMenuProvider {
+public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 
 	public SimpleInventory input = new SimpleInventory(1) {
 		@Override
@@ -100,11 +98,6 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity implements Ex
 	@Override
 	public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
 		return new SurvivalSpawnerScreenHandler(syncId, inv, this);
-	}
-
-	@Override
-	public void saveExtraData(PacketByteBuf buf) {
-		buf.writeBlockPos(this.getPos());
 	}
 
 	@Override

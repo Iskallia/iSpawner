@@ -165,13 +165,20 @@ public class SpawnerRenderer {
 		public void drawLine(MatrixStack matrices, VertexConsumer vertexConsumer,
 		                     double x1, double y1, double z1,
 		                     double x2, double y2, double z2, BlockPos offset) {
-			Matrix4f matrix = matrices.peek().getPositionMatrix();
+			Matrix4f posMatrix = matrices.peek().getPositionMatrix();
+			Matrix3f normMatrix = matrices.peek().getNormalMatrix();
 			BlockPos p = this.pos.add(offset);
 
-			vertexConsumer.vertex(matrix, p.getX() + (float)x1, p.getY() + (float)y1, p.getZ() + (float)z1)
-					.color(this.color.getFRed(), this.color.getFGreen(), this.color.getFBlue(), 1.0F).next();
-			vertexConsumer.vertex(matrix, p.getX() + (float)x2, p.getY() + (float)y2, p.getZ() + (float)z2)
-					.color(this.color.getFRed(), this.color.getFGreen(), this.color.getFBlue(), 1.0F).next();
+			vertexConsumer
+				.vertex(posMatrix, p.getX() + (float)x1, p.getY() + (float)y1, p.getZ() + (float)z1)
+				.color(this.color.getFRed(), this.color.getFGreen(), this.color.getFBlue(), 1.0F)
+				.normal(normMatrix, 1.0F, 0.0F, 0.0F)
+				.next();
+			vertexConsumer
+				.vertex(posMatrix, p.getX() + (float)x2, p.getY() + (float)y2, p.getZ() + (float)z2)
+				.color(this.color.getFRed(), this.color.getFGreen(), this.color.getFBlue(), 1.0F)
+				.normal(normMatrix, 1.0F, 0.0F, 0.0F)
+				.next();
 		}
 
 		@Override

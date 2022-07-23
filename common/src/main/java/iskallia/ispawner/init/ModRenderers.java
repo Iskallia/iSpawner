@@ -7,19 +7,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 
 import java.util.Map;
 
 public class ModRenderers extends ModRegistries {
 
 	public static class BlockEntities extends ModRenderers {
-		public static SpawnerBlockRenderer<SpawnerBlockEntity> SPAWNER;
-		public static SpawnerBlockRenderer<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
+		public static BlockEntityRendererFactory<SpawnerBlockEntity> SPAWNER;
+		public static BlockEntityRendererFactory<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
-		public static void register(Map<BlockEntityType<?>, BlockEntityRenderer<?>> registry) {
-			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, new SpawnerBlockRenderer<>());
-			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, new SpawnerBlockRenderer<>());
+		public static void register(Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> registry) {
+			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, SpawnerBlockRenderer::new);
+			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, SpawnerBlockRenderer::new);
 		}
 	}
 
@@ -30,8 +30,9 @@ public class ModRenderers extends ModRegistries {
 		}
 	}
 
-	public static <T extends BlockEntity, R extends BlockEntityRenderer<T>> R register(Map<BlockEntityType<?>, BlockEntityRenderer<?>> registry,
-	                                                                                   BlockEntityType<T> type, R renderer) {
+	public static <T extends BlockEntity> BlockEntityRendererFactory<T> register(
+												Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> registry,
+												BlockEntityType<? extends T> type, BlockEntityRendererFactory<T> renderer) {
 		registry.put(type, renderer);
 		return renderer;
 	}
