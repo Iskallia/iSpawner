@@ -13,13 +13,15 @@ import java.util.Map;
 
 public class ModRenderers extends ModRegistries {
 
+	public static Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> FACTORIES;
+
 	public static class BlockEntities extends ModRenderers {
 		public static BlockEntityRendererFactory<SpawnerBlockEntity> SPAWNER;
 		public static BlockEntityRendererFactory<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
-		public static void register(Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> registry) {
-			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER, SpawnerBlockRenderer::new);
-			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER, SpawnerBlockRenderer::new);
+		public static void register() {
+			SPAWNER = register(ModBlocks.Entities.SPAWNER, SpawnerBlockRenderer::new);
+			SURVIVAL_SPAWNER = register(ModBlocks.Entities.SURVIVAL_SPAWNER, SpawnerBlockRenderer::new);
 		}
 	}
 
@@ -31,9 +33,8 @@ public class ModRenderers extends ModRegistries {
 	}
 
 	public static <T extends BlockEntity> BlockEntityRendererFactory<T> register(
-												Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> registry,
-												BlockEntityType<? extends T> type, BlockEntityRendererFactory<T> renderer) {
-		registry.put(type, renderer);
+		BlockEntityType<? extends T> type, BlockEntityRendererFactory<T> renderer) {
+		FACTORIES.put(type, renderer);
 		return renderer;
 	}
 

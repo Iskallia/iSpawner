@@ -28,6 +28,7 @@ public class ModRegistries {
 
 		if(Platform.getEnvironment() == Env.CLIENT) {
 			ModScreens.register();
+			ModRenderers.BlockEntities.register();
 		}
 
 		BLOCKS.register();

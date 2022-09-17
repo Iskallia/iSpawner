@@ -20,7 +20,7 @@ public class MixinBlockEntityRendererFactories {
 
 	@Inject(method = "<clinit>", at = @At("RETURN"))
 	private static void staticInit(CallbackInfo ci) {
-		ModRenderers.BlockEntities.register(FACTORIES);
+		ModRenderers.BlockEntities.FACTORIES = FACTORIES;
 	}
 
 }

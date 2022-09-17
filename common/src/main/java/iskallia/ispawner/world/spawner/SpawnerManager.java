@@ -13,6 +13,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 	public WeightedList<SpawnerAction> actions = new WeightedList<>();
 	public SpawnerSettings settings = new SpawnerSettings();
+	public int spawnTimer;
 
 	public SpawnerManager() {
 
@@ -51,13 +53,24 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 	}
 
 	public void tick(World world, Random random, SpawnerBlockEntity entity) {
-		if(this.settings.getSpawnDelay() == 0
-				|| world.getTime() % this.settings.getSpawnDelay() != 0)return;
+		BlockPos pos = entity.getPos();
 
-		int power = world.getReceivedRedstonePower(entity.getPos());
+		if(this.settings.getPlayerRadius() >= 0) {
+			PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
+					this.settings.getPlayerRadius(), false);
+			if(closestPlayer == null) return;
+		}
+
+		if(this.settings.getSpawnDelay() < 0) return;
+		boolean shouldSpawn = this.spawnTimer == 0;
+		this.spawnTimer = MathHelper.clamp(this.spawnTimer, 0, this.settings.spawnDelay);
+		this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
+		if(!shouldSpawn) return;
+
+		int power = world.getReceivedRedstonePower(pos);
 
 		if(this.settings.getMode() == SpawnerSettings.Mode.ALWAYS_ON ||
-				(this.settings.getMode() == SpawnerSettings.Mode.REDSTONE_ON && power != 0)) {
+				(this.settings.getMode() == SpawnerSettings.Mode.REDSTONE_ON && power > 0)) {
 			this.spawn(world, random, entity);
 		}
 	}
@@ -74,12 +87,6 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 		if(pool.isEmpty()) return;
 		BlockPos pos = entity.getPos();
-
-		if(this.settings.getPlayerRadius() >= 0) {
-			PlayerEntity closestPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(),
-				this.settings.getPlayerRadius(), false);
-			if(closestPlayer == null) return;
-		}
 
 		Map<SpawnGroup, Integer> entityMap = new HashMap<>();
 
@@ -127,6 +134,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 		nbt.put("Actions", actionsList);
 		nbt.put("Settings", this.settings.writeToNBT());
+		nbt.putInt("SpawnTimer", this.spawnTimer);
 		return nbt;
 	}
 
@@ -142,6 +150,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		});
 
 		this.settings.readFromNBT(nbt.getCompound("Settings"));
+		this.spawnTimer = nbt.getInt("SpawnTimer");
 	}
 
 	public static class Entry {

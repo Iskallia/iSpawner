@@ -84,7 +84,7 @@ public class SpawnerScreen extends HandledScreen<SpawnerScreenHandler> {
 			}
 		});
 
-		this.addDrawable(this.spawnDelayTextField);
+		this.addDrawableChild(this.spawnDelayTextField);
 
 		this.modeButton = this.addDrawableChild(new ButtonWidget(40, offset + 50, 160, 20, new LiteralText(SpawnerSettings.Mode.values()[0].text),
 				button -> {

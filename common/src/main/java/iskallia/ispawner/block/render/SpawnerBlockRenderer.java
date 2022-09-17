@@ -52,7 +52,7 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements Block
 	@Override
 	public void render(T entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		ClientPlayerEntity player = MinecraftClient.getInstance().player;
-		if(player == null)return;
+		if(player == null) return;
 
 		boolean rendered = tryRender(entity, matrices, vertexConsumers, player.getStackInHand(Hand.MAIN_HAND))
 				|| tryRender(entity, matrices, vertexConsumers, player.getStackInHand(Hand.OFF_HAND));
@@ -75,10 +75,18 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements Block
 			int r = entity.manager.settings.getCheckRadius();
 
 			WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
-				-r, -r, -r,
-				r + 1.0D, r + 1.0D, r + 1.0D,
-				1.0F, 1.0F, 1.0F, 1.0F,
-				1.0F, 1.0F, 1.0F);
+					-r, -r, -r,
+					r + 1.0D, r + 1.0D, r + 1.0D,
+					1.0F, 0.0F, 0.0F, 1.0F,
+					1.0F, 0.0F, 0.0F);
+
+			r = entity.manager.settings.getPlayerRadius();
+
+			WorldRenderer.drawBox(matrices, vertexConsumers.getBuffer(RenderLayer.getLines()),
+					-r, -r, -r,
+					r + 1.0D, r + 1.0D, r + 1.0D,
+					0.0F, 1.0F, 0.0F, 1.0F,
+					0.0F, 1.0F, 0.0F);
 		}
 
 		this.renderEntity(entity, tickDelta, matrices, vertexConsumers, light, overlay);
@@ -123,9 +131,9 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements Block
 
 	private ItemStack getRenderedItem(T entity) {
 		List<ItemStack> items = IntStream.range(0, entity.inventory.size())
-				.mapToObj(i -> entity.inventory.getStack(i))
+				.mapToObj(entity.inventory::getStack)
 				.filter(stack -> !stack.isEmpty())
-				.collect(Collectors.toList());
+				.toList();
 
 		if(items.size() == 0)return null;
 		int i = (int)((entity.getWorld().getTime() / 40) % items.size());
