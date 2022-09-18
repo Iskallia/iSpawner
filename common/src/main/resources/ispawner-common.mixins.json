@@ -9,7 +9,6 @@
   ],
   "client": [
     "MixinBlockEntityRendererFactories",
-    "MixinHandledScreens",
     "MixinClientPlayNetworkHandler",
     "MixinRenderLayers"
   ],

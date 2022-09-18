@@ -34,6 +34,10 @@ public class ModRegistries {
 		BLOCK_ENTITY_TYPES.register();
 		SCREEN_HANDLERS.register();
 
+		if(Platform.getEnvironment() == Env.CLIENT) {
+			ModScreens.register();
+		}
+
 		ModConfigs.register();
 	}
 
