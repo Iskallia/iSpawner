@@ -35,7 +35,7 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 	};
 
 	public SurvivalSpawnerBlockEntity(BlockPos pos, BlockState state) {
-		this(ModBlocks.Entities.SURVIVAL_SPAWNER, pos, state);
+		this(ModBlocks.Entities.SURVIVAL_SPAWNER.get(), pos, state);
 	}
 
 	public SurvivalSpawnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

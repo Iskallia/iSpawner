@@ -30,7 +30,7 @@ public class SurvivalSpawnerBlock extends SpawnerBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, ModBlocks.Entities.SURVIVAL_SPAWNER, SurvivalSpawnerBlockEntity::tick);
+        return checkType(type, ModBlocks.Entities.SURVIVAL_SPAWNER.get(), SurvivalSpawnerBlockEntity::tick);
     }
 
 }

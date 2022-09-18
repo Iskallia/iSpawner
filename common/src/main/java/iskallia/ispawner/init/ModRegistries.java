@@ -2,6 +2,7 @@ package iskallia.ispawner.init;
 
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import iskallia.ispawner.ISpawner;
 import net.minecraft.block.Block;
@@ -10,6 +11,8 @@ import net.minecraft.item.Item;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+
+import java.util.function.Supplier;
 
 public class ModRegistries {
 
@@ -26,11 +29,6 @@ public class ModRegistries {
 		ModMenus.register();
 		ModNetwork.register();
 
-		if(Platform.getEnvironment() == Env.CLIENT) {
-			ModScreens.register();
-			ModRenderers.BlockEntities.register();
-		}
-
 		BLOCKS.register();
 		ITEMS.register();
 		BLOCK_ENTITY_TYPES.register();
@@ -39,14 +37,12 @@ public class ModRegistries {
 		ModConfigs.register();
 	}
 
-	public static <T, V extends T> V register(DeferredRegister<T> registry, Identifier id, V value) {
-		registry.register(id, () -> value);
-		return value;
+	public static <T, V extends T> RegistrySupplier<V> register(DeferredRegister<T> registry, Identifier id, Supplier<V> value) {
+		return registry.register(id, value);
 	}
 
-	public static <T, V extends T> V register(DeferredRegister<T> registry, String name, V value) {
-		registry.register(name, () -> value);
-		return value;
+	public static <T, V extends T> RegistrySupplier<V> register(DeferredRegister<T> registry, String name, Supplier<V> value) {
+		return registry.register(name, value);
 	}
 
 }

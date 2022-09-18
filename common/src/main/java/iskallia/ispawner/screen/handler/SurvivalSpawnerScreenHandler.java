@@ -33,7 +33,7 @@ public class SurvivalSpawnerScreenHandler extends ScreenHandler {
 	}
 
 	protected SurvivalSpawnerScreenHandler(int syncId, PlayerInventory playerInventory, SimpleInventory spawnerInventory, BlockPos spawnerPos) {
-		super(ModMenus.SURVIVAL_SPAWNER, syncId);
+		super(ModMenus.SURVIVAL_SPAWNER.get(), syncId);
 		this.playerInventory = playerInventory;
 		this.spawnerInventory = spawnerInventory;
 		this.spawnerPos = spawnerPos;

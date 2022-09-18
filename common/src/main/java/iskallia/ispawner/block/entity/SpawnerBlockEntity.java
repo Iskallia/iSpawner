@@ -35,7 +35,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuP
 	public BlockPos offset = BlockPos.ORIGIN;
 
 	public SpawnerBlockEntity(BlockPos pos, BlockState state) {
-		this(ModBlocks.Entities.SPAWNER, pos, state);
+		this(ModBlocks.Entities.SPAWNER.get(), pos, state);
 	}
 
 	public SpawnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

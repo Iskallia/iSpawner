@@ -94,7 +94,7 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return checkType(type, ModBlocks.Entities.SPAWNER, SpawnerBlockEntity::tick);
+		return checkType(type, ModBlocks.Entities.SPAWNER.get(), SpawnerBlockEntity::tick);
 	}
 
 	@Override
