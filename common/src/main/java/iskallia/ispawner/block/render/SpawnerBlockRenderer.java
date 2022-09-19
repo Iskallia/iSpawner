@@ -93,7 +93,7 @@ public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements Block
 	}
 
 	public boolean tryRender(T entity, MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack) {
-		if(stack.getItem() == ModItems.SPAWNER_CONTROLLER) {
+		if(stack.getItem() == ModItems.SPAWNER_CONTROLLER.get()) {
 			SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 
 			if(controller.getTarget().isPresent() && controller.getTarget().get().equals(entity.getPos())) {

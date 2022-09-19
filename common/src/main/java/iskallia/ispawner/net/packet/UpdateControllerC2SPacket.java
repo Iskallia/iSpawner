@@ -41,7 +41,7 @@ public class UpdateControllerC2SPacket implements ModPacket<ServerPlayNetworkHan
 	@Override
 	public void onReceived(ServerPlayNetworkHandler listener) {
 		ItemStack stack = listener.player.getStackInHand(Hand.MAIN_HAND);
-		if(stack.getItem() != ModItems.SPAWNER_CONTROLLER)return;
+		if(stack.getItem() != ModItems.SPAWNER_CONTROLLER.get()) return;
 
 		SpawnerController controller = new SpawnerController(stack.getOrCreateSubNbt("Controller"));
 		controller.setTarget(this.getTarget());

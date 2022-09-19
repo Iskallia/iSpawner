@@ -68,7 +68,7 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (player.getStackInHand(hand).getItem() == ModItems.SPAWNER_CONTROLLER) {
+		if (player.getStackInHand(hand).getItem() == ModItems.SPAWNER_CONTROLLER.get()) {
 			return ActionResult.PASS;
 		}
 		if (world.isClient() || !(player instanceof ServerPlayerEntity)) {
