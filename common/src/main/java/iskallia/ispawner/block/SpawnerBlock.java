@@ -19,27 +19,30 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
-	public static final DirectionProperty FACING = Properties.FACING;
+	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+	public static final EnumProperty<Mirror> MIRROR = EnumProperty.of("mirror", Mirror.class);
 	public static final BooleanProperty POWERED = Properties.POWERED;
 
 	public SpawnerBlock(Settings settings) {
 		super(settings);
-		this.setDefaultState(this.getDefaultState().with(FACING, Direction.NORTH).with(POWERED, false));
+		this.setDefaultState(this.getDefaultState()
+			.with(FACING, Direction.NORTH)
+			.with(MIRROR, Mirror.NONE)
+			.with(POWERED, false));
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-		builder.add(FACING, POWERED);
+		builder.add(FACING, MIRROR, POWERED);
 	}
 
 	@Override
@@ -59,7 +62,21 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public BlockState mirror(BlockState state, BlockMirror mirror) {
-		return state.rotate(mirror.getRotation(state.get(FACING)));
+		return switch(mirror) {
+			case NONE -> state;
+
+			case FRONT_BACK -> switch(state.get(MIRROR)) {
+					case NONE -> state.with(MIRROR, Mirror.FRONT_BACK);
+					case FRONT_BACK -> state.with(MIRROR, Mirror.NONE);
+					case LEFT_RIGHT -> this.rotate(state, BlockRotation.CLOCKWISE_180).with(MIRROR, Mirror.NONE);
+				};
+
+			case LEFT_RIGHT -> switch(state.get(MIRROR)) {
+					case NONE -> state.with(MIRROR, Mirror.LEFT_RIGHT);
+					case LEFT_RIGHT -> state.with(MIRROR, Mirror.NONE);
+					case FRONT_BACK -> this.rotate(state, BlockRotation.CLOCKWISE_180).with(MIRROR, Mirror.NONE);
+				};
+		};
 	}
 
 	public BlockState getPlacementState(ItemPlacementContext context) {
@@ -145,6 +162,23 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 		}
 
 		super.randomDisplayTick(state, world, pos, random);
+	}
+
+	public enum Mirror implements StringIdentifiable {
+		NONE, LEFT_RIGHT, FRONT_BACK;
+
+		public BlockMirror toBlockMirror() {
+			return BlockMirror.values()[this.ordinal()];
+		}
+
+		public static Mirror fromBlockMirror(BlockMirror blockMirror) {
+			return Mirror.values()[blockMirror.ordinal()];
+		}
+
+		@Override
+		public String asString() {
+			return this.name().toLowerCase(Locale.ROOT);
+		}
 	}
 
 }

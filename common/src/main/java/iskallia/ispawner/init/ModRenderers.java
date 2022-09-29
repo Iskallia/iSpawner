@@ -1,5 +1,6 @@
 package iskallia.ispawner.init;
 
+import dev.architectury.event.events.client.ClientLifecycleEvent;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.block.render.SpawnerBlockRenderer;
@@ -19,15 +20,29 @@ public class ModRenderers extends ModRegistries {
 		public static BlockEntityRendererFactory<SurvivalSpawnerBlockEntity> SURVIVAL_SPAWNER;
 
 		public static void register(Map<BlockEntityType<?>, BlockEntityRendererFactory<?>> registry) {
-			SPAWNER = register(registry, ModBlocks.Entities.SPAWNER.get(), SpawnerBlockRenderer::new);
-			SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER.get(), SpawnerBlockRenderer::new);
+			try {
+				register(registry, ModBlocks.Entities.SPAWNER.get(), SpawnerBlockRenderer::new);
+				register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER.get(), SpawnerBlockRenderer::new);
+			} catch(Exception e) {
+				ClientLifecycleEvent.CLIENT_SETUP.register(minecraft -> {
+					SPAWNER = register(registry, ModBlocks.Entities.SPAWNER.get(), SpawnerBlockRenderer::new);
+					SURVIVAL_SPAWNER = register(registry, ModBlocks.Entities.SURVIVAL_SPAWNER.get(), SpawnerBlockRenderer::new);
+				});
+			}
 		}
 	}
 
 	public static class RenderLayers {
 		public static void register(Map<Block, RenderLayer> registry, boolean fancyGraphicsOrBetter) {
-			ModRenderers.register(registry, ModBlocks.SPAWNER.get(), RenderLayer.getCutout());
-			ModRenderers.register(registry, ModBlocks.SURVIVAL_SPAWNER.get(), RenderLayer.getCutout());
+			try {
+				ModRenderers.register(registry, ModBlocks.SPAWNER.get(), RenderLayer.getCutout());
+				ModRenderers.register(registry, ModBlocks.SURVIVAL_SPAWNER.get(), RenderLayer.getCutout());
+			} catch(Exception e) {
+				ClientLifecycleEvent.CLIENT_SETUP.register(minecraft -> {
+					ModRenderers.register(registry, ModBlocks.SPAWNER.get(), RenderLayer.getCutout());
+					ModRenderers.register(registry, ModBlocks.SURVIVAL_SPAWNER.get(), RenderLayer.getCutout());
+				});
+			}
 		}
 	}
 

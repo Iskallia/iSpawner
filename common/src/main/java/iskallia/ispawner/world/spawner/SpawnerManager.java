@@ -110,7 +110,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 			if(entity.canUseCharge(entry.stack, entry.index)) {
 				boolean result = this.actions.getRandom(random)
-						.toAbsolute(entity.getCenterPos(), entity.getRotation())
+						.toAbsolute(entity.getCenterPos(), entity.getRotation(), entity.getMirror())
 						.execute(world, entry.stack.copy(), entity instanceof SurvivalSpawnerBlockEntity);
 
 				if(result) {

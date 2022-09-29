@@ -1,5 +1,6 @@
 package iskallia.ispawner.world.spawner;
 
+import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.nbt.INBTSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -15,6 +16,7 @@ import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -46,9 +48,11 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 		this.directions = directions;
 	}
 
-	public SpawnerAction toAbsolute(BlockPos pos, BlockRotation rotation) {
-		return new SpawnerAction(this.getPos().rotate(rotation).add(pos), rotation.rotate(this.getSide()),
-				rotate(rotation, this.getHitPos()).add(pos.getX(), pos.getY(), pos.getZ()),
+	public SpawnerAction toAbsolute(BlockPos pos, BlockRotation rotation, BlockMirror mirror) {
+		return new SpawnerAction(
+				SpawnerBlockEntity.mirror(this.getPos().rotate(rotation), mirror).add(pos),
+				SpawnerBlockEntity.mirror(rotation.rotate(this.getSide()), mirror),
+				SpawnerBlockEntity.mirror(rotate(rotation, this.getHitPos()), mirror).add(pos.getX(), pos.getY(), pos.getZ()),
 				this.getHand(), this.getDirections());
 	}
 

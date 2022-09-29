@@ -22,6 +22,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.spawner.Spawner;
 
 public class SpawnerControllerItem extends Item {
 
@@ -45,9 +46,9 @@ public class SpawnerControllerItem extends Item {
 					BlockPos offset = pos.subtract(spawner.getCenterPos());
 
 					spawner.manager.addAction(new SpawnerAction(
-							offset.rotate(rotation),
-							rotation.rotate(context.getSide()),
-							context.getPos(),
+							SpawnerBlockEntity.mirror(offset.rotate(rotation), spawner.getMirror()),
+							SpawnerBlockEntity.mirror(rotation.rotate(context.getSide()), spawner.getMirror()),
+							SpawnerBlockEntity.mirror(context.getPos(), spawner.getMirror()),
 							Hand.MAIN_HAND,
 							Direction.getEntityFacingOrder(player)), -1);
 
@@ -78,8 +79,7 @@ public class SpawnerControllerItem extends Item {
 		} else {
 			controller.getTarget().ifPresent(spawnerPos -> {
 				BlockEntity blockEntity = context.getWorld().getBlockEntity(spawnerPos);
-				if(!(blockEntity instanceof SpawnerBlockEntity))return;
-				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
+				if(!(blockEntity instanceof SpawnerBlockEntity spawner)) return;
 
 				if(controller.getMode() == SpawnerController.Mode.SPAWNING_SPACES) {
 					BlockRotation rotation = spawner.getReverseRotation();
@@ -88,9 +88,9 @@ public class SpawnerControllerItem extends Item {
 							spawner.getCenterPos().getY(), spawner.getCenterPos().getZ());
 
 					spawner.manager.addAction(new SpawnerAction(
-							offset.rotate(rotation),
-							rotation.rotate(context.getSide()),
-							SpawnerAction.rotate(rotation, hitPosOffset),
+							SpawnerBlockEntity.mirror(offset.rotate(rotation), spawner.getMirror()),
+							SpawnerBlockEntity.mirror(rotation.rotate(context.getSide()), spawner.getMirror()),
+							SpawnerBlockEntity.mirror(SpawnerAction.rotate(rotation, hitPosOffset), spawner.getMirror()),
 							context.getHand(),
 							Direction.getEntityFacingOrder(context.getPlayer())), 1);
 
@@ -98,7 +98,7 @@ public class SpawnerControllerItem extends Item {
 				} else if(controller.getMode() == SpawnerController.Mode.RELOCATOR) {
 					BlockRotation rotation = spawner.getReverseRotation();
 					BlockPos offset = context.getBlockPos().subtract(spawner.getPos());
-					spawner.setOffset(offset.rotate(rotation));
+					spawner.setOffset(SpawnerBlockEntity.mirror(offset.rotate(rotation), spawner.getMirror()));
 					spawner.sendClientUpdates();
 				}
 			});

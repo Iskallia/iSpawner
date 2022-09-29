@@ -22,10 +22,14 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import java.util.Collection;
 
 public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuProvider, NamedScreenHandlerFactory, InventoryChangedListener {
 
@@ -107,7 +111,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuP
 	}
 
 	public BlockPos getOffset() {
-		return this.offset.rotate(this.getRotation());
+		return mirror(this.offset.rotate(this.getRotation()), this.getMirror());
 	}
 
 	public void setOffset(BlockPos offset) {
@@ -150,6 +154,43 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuP
 		}
 
 		return null;
+	}
+
+	public BlockMirror getMirror() {
+		return this.getCachedState().get(SpawnerBlock.MIRROR).toBlockMirror();
+	}
+
+	public static BlockPos mirror(BlockPos pos, SpawnerBlock.Mirror mirror) {
+		return switch(mirror) {
+			case FRONT_BACK -> new BlockPos(-pos.getX(), pos.getY(), pos.getZ());
+			case LEFT_RIGHT -> new BlockPos(pos.getX(), pos.getY(), -pos.getZ());
+			case NONE       -> pos;
+		};
+	}
+
+	public static BlockPos mirror(BlockPos pos, BlockMirror mirror) {
+		return switch(mirror) {
+			case FRONT_BACK -> new BlockPos(-pos.getX(), pos.getY(), pos.getZ());
+			case LEFT_RIGHT -> new BlockPos(pos.getX(), pos.getY(), -pos.getZ());
+			case NONE       -> pos;
+		};
+	}
+
+	public static Direction mirror(Direction facing, BlockMirror mirror) {
+		if(facing.getAxis() == Direction.Axis.X && mirror == BlockMirror.FRONT_BACK
+			|| facing.getAxis() == Direction.Axis.Z && mirror == BlockMirror.LEFT_RIGHT) {
+			return facing.getOpposite();
+		}
+
+		return facing;
+	}
+
+	public static Vec3d mirror(Vec3d pos, BlockMirror mirror) {
+		return switch(mirror) {
+			case FRONT_BACK -> new Vec3d(-pos.getX(), pos.getY(), pos.getZ());
+			case LEFT_RIGHT -> new Vec3d(pos.getX(), pos.getY(), -pos.getZ());
+			case NONE       -> pos;
+		};
 	}
 
 }

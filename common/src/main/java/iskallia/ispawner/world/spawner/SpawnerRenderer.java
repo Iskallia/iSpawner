@@ -23,8 +23,10 @@ public class SpawnerRenderer {
 		this.faces.clear();
 
 		entity.manager.actions.forEach(entry -> {
-			this.faces.add(new Face(entry.value.getPos().rotate(entity.getRotation()),
-					entity.getRotation().rotate(entry.value.getSide()), entry.weight));
+			this.faces.add(new Face(
+				SpawnerBlockEntity.mirror(entry.value.getPos().rotate(entity.getRotation()), entity.getMirror()),
+				SpawnerBlockEntity.mirror(entity.getRotation().rotate(entry.value.getSide()), entity.getMirror()),
+				entry.weight));
 		});
 	}
 
