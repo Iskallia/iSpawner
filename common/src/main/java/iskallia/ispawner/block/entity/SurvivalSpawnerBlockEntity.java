@@ -84,9 +84,9 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 						Vec3d hitPosOffset = new Vec3d(0.5D, 1.0D, 0.5D);
 
 						spawner.manager.addAction(new SpawnerAction(
-							SpawnerBlockEntity.mirror(new BlockPos(x, y, z).rotate(rotation), spawner.getMirror()),
-							SpawnerBlockEntity.mirror(rotation.rotate(Direction.UP), spawner.getMirror()),
-							SpawnerBlockEntity.mirror(SpawnerAction.rotate(rotation, hitPosOffset), spawner.getMirror()),
+							SpawnerBlockEntity.mirror(new BlockPos(x, y, z), spawner.getMirror()).rotate(rotation),
+							Direction.UP,
+							SpawnerAction.rotate(rotation, SpawnerBlockEntity.mirror(hitPosOffset, spawner.getMirror())),
 							Hand.MAIN_HAND,
 							new Direction[] {Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.DOWN}), weight);
 					}

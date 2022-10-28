@@ -57,30 +57,41 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 	@Override
 	public BlockState rotate(BlockState state, BlockRotation rotation) {
-		return state.with(FACING, rotation.rotate(state.get(FACING)));
+		int index = SpawnerRotation.getIndex(this.toRotation(state.get(FACING)), state.get(MIRROR).toBlockMirror());
+		index = SpawnerRotation.multiply(index, rotation, BlockMirror.NONE);
+		return state.with(FACING, this.toFacing(SpawnerRotation.getRotation(index)))
+					.with(MIRROR, Mirror.fromBlockMirror(SpawnerRotation.getMirror(index)));
 	}
 
 	@Override
 	public BlockState mirror(BlockState state, BlockMirror mirror) {
-		return switch(mirror) {
-			case NONE -> state;
-
-			case FRONT_BACK -> switch(state.get(MIRROR)) {
-					case NONE -> state.with(MIRROR, Mirror.FRONT_BACK);
-					case FRONT_BACK -> state.with(MIRROR, Mirror.NONE);
-					case LEFT_RIGHT -> this.rotate(state, BlockRotation.CLOCKWISE_180).with(MIRROR, Mirror.NONE);
-				};
-
-			case LEFT_RIGHT -> switch(state.get(MIRROR)) {
-					case NONE -> state.with(MIRROR, Mirror.LEFT_RIGHT);
-					case LEFT_RIGHT -> state.with(MIRROR, Mirror.NONE);
-					case FRONT_BACK -> this.rotate(state, BlockRotation.CLOCKWISE_180).with(MIRROR, Mirror.NONE);
-				};
-		};
+		int index = SpawnerRotation.getIndex(this.toRotation(state.get(FACING)), state.get(MIRROR).toBlockMirror());
+		index = SpawnerRotation.multiply(index, BlockRotation.NONE, mirror);
+		return state.with(FACING, this.toFacing(SpawnerRotation.getRotation(index)))
+			.with(MIRROR, Mirror.fromBlockMirror(SpawnerRotation.getMirror(index)));
 	}
 
 	public BlockState getPlacementState(ItemPlacementContext context) {
 		return this.getDefaultState().with(FACING, context.getPlayerFacing().getOpposite());
+	}
+
+	public BlockRotation toRotation(Direction facing) {
+		return switch(facing) {
+			case NORTH -> BlockRotation.NONE;
+			case SOUTH -> BlockRotation.CLOCKWISE_180;
+			case WEST -> BlockRotation.COUNTERCLOCKWISE_90;
+			case EAST -> BlockRotation.CLOCKWISE_90;
+			default -> throw new UnsupportedOperationException();
+		};
+	}
+
+	public Direction toFacing(BlockRotation rotation) {
+		return switch(rotation) {
+			case NONE -> Direction.NORTH;
+			case CLOCKWISE_180 -> Direction.SOUTH;
+			case COUNTERCLOCKWISE_90 -> Direction.WEST;
+			case CLOCKWISE_90 -> Direction.EAST;
+		};
 	}
 
 	@Override

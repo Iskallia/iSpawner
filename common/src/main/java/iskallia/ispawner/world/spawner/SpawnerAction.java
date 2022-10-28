@@ -90,10 +90,10 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 		return this.directions;
 	}
 
-	public boolean execute(World world, ItemStack stack, boolean checkEgg) {
+	public boolean execute(World world, ItemStack stack) {
 		if(stack.getItem() instanceof ThrowablePotionItem) {
 			return this.applyPotionOverride(world, stack);
-		} else if(stack.getItem() instanceof SpawnEggItem && checkEgg) {
+		} else if(stack.getItem() instanceof SpawnEggItem) {
 			return this.applyEggOverride(world, stack);
 		} else {
 			stack.useOnBlock(new SpawnerUsageContext(world, stack, this));

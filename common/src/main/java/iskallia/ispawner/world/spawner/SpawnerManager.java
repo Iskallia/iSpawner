@@ -62,15 +62,14 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		}
 
 		if(this.settings.getSpawnDelay() < 0) return;
-		boolean shouldSpawn = this.spawnTimer == 0;
-		this.spawnTimer = MathHelper.clamp(this.spawnTimer, 0, this.settings.spawnDelay);
-		this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
-		if(!shouldSpawn) return;
-
 		int power = world.getReceivedRedstonePower(pos);
 
-		if(this.settings.getMode() == SpawnerSettings.Mode.ALWAYS_ON ||
-				(this.settings.getMode() == SpawnerSettings.Mode.REDSTONE_ON && power > 0)) {
+		if(this.settings.getMode() == SpawnerSettings.Mode.ALWAYS_ON
+			|| this.settings.getMode() == SpawnerSettings.Mode.REDSTONE_ON && power > 0) {
+			boolean shouldSpawn = this.spawnTimer == 0;
+			this.spawnTimer = MathHelper.clamp(this.spawnTimer, 0, this.settings.spawnDelay);
+			this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
+			if(!shouldSpawn) return;
 			this.spawn(world, random, entity);
 		}
 	}
@@ -111,7 +110,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			if(entity.canUseCharge(entry.stack, entry.index)) {
 				boolean result = this.actions.getRandom(random)
 						.toAbsolute(entity.getCenterPos(), entity.getRotation(), entity.getMirror())
-						.execute(world, entry.stack.copy(), entity instanceof SurvivalSpawnerBlockEntity);
+						.execute(world, entry.stack.copy());
 
 				if(result) {
 					entity.onChargeUsed(entry.stack, entry.index);
