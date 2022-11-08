@@ -1,15 +1,18 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
-import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
+import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -27,6 +30,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 	public WeightedList<SpawnerAction> actions = new WeightedList<>();
 	public SpawnerSettings settings = new SpawnerSettings();
 	public int spawnTimer;
+	public int usesLeft = -1;
 
 	public SpawnerManager() {
 
@@ -71,7 +75,16 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
 			if(!shouldSpawn) return;
 			this.spawn(world, random, entity);
+			this.tickUses(world, pos);
 		}
+	}
+
+	private void tickUses(World world, BlockPos pos) {
+		if(this.usesLeft < 0) return;
+		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.2F, 0.4F);
+		world.addBlockBreakParticles(pos, ModBlocks.SPAWNER.get().getDefaultState());
+		if(--this.usesLeft != 0) return;
+		world.breakBlock(pos, false);
 	}
 
 	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
@@ -134,6 +147,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		nbt.put("Actions", actionsList);
 		nbt.put("Settings", this.settings.writeToNBT());
 		nbt.putInt("SpawnTimer", this.spawnTimer);
+		if(this.usesLeft >= 0) nbt.putInt("UsesLeft", this.usesLeft);
 		return nbt;
 	}
 
@@ -150,6 +164,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 		this.settings.readFromNBT(nbt.getCompound("Settings"));
 		this.spawnTimer = nbt.getInt("SpawnTimer");
+		this.usesLeft = nbt.contains("UsesLeft", NBTConstants.INT) ? nbt.getInt("UsesLeft") : -1;
 	}
 
 	public static class Entry {
