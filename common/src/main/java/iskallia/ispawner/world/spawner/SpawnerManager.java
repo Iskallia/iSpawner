@@ -81,10 +81,11 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 
 	private void tickUses(World world, BlockPos pos) {
 		if(this.usesLeft < 0) return;
-		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.2F, 0.4F);
+		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 0.4F, 0.4F);
 		world.addBlockBreakParticles(pos, ModBlocks.SPAWNER.get().getDefaultState());
 		if(--this.usesLeft != 0) return;
 		world.breakBlock(pos, false);
+		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4F, 0.4F);
 	}
 
 	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
