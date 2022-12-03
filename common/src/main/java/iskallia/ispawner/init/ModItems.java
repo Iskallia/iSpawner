@@ -33,10 +33,7 @@ public class ModItems extends ModRegistries {
 
 	public static class NBT {
 		public static void register() {
-			ItemNBT.registerOverride(stack -> {
-				if(ModConfigs.SURVIVAL_SPAWNER == null) return false;
-				return ModConfigs.SURVIVAL_SPAWNER.isWhitelisted(stack);
-			}, SpawnData::new);
+
 		}
 	}
 
