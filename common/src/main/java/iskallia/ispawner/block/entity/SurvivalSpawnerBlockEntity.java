@@ -56,24 +56,7 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 			spawner.sendClientUpdates();
 		}
 
-		if (spawner.inventory.isEmpty()) {
-			for (int i = 0; i < spawner.input.size(); i++) {
-				ItemStack stack = spawner.input.getStack(i);
-				if (stack.isEmpty()) continue;
-				if (!spawner.input.canInsert(i, stack, Direction.NORTH)) continue;
-
-				OptionalInt emptySlot = spawner.inventory.getEmptySlot();
-
-				if (emptySlot.isPresent()) {
-					ItemStack newStack = new ItemStack(stack.getItem());
-					newStack.setCount(new SpawnData(stack).getCharges());
-					spawner.inventory.setStack(emptySlot.getAsInt(), newStack);
-					stack.decrement(1);
-					spawner.input.setStack(i, stack);
-					break;
-				}
-			}
-		}
+		spawner.inventory.setStack(0, spawner.input.getStack(0).copy());
 
 		if(spawner.manager.actions.isEmpty()) {
 			for(int x = -4; x <= 4; x++) {
@@ -93,6 +76,8 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 				}
 			}
 		}
+
+		SpawnerBlockEntity.tick(world, pos, state, spawner);
 	}
 
 	@Override
