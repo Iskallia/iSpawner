@@ -9,7 +9,6 @@ import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
@@ -90,12 +89,12 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 		return this.directions;
 	}
 
-	public boolean execute(World world, ItemStack stack) {
+	public boolean execute(World world, ItemStack stack, SpawnerContext context) {
 		if(stack.getItem() instanceof ThrowablePotionItem) {
-			return this.applyPotionOverride(world, stack);
+			return this.applyPotionOverride(world, stack, context);
 		} else if(stack.getItem() instanceof SpawnEggItem) {
-			return this.applyEggOverride(world, stack);
-		} else {
+			return this.applyEggOverride(world, stack, context);
+		} else if(context == SpawnerContext.USE) {
 			stack.useOnBlock(new SpawnerUsageContext(world, stack, this));
 		}
 
@@ -124,18 +123,19 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 		this.directions = Arrays.stream(nbt.getIntArray("Directions")).mapToObj(i -> Direction.values()[i]).toArray(Direction[]::new);
 	}
 
-	public boolean applyPotionOverride(World world, ItemStack stack) {
+	public boolean applyPotionOverride(World world, ItemStack stack, SpawnerContext context) {
+		if(context != SpawnerContext.USE) return false;
 		PotionEntity potion = new PotionEntity(world, this.getHitPos().getX(), this.getHitPos().getY(), this.getHitPos().getZ());
 		potion.setItem(stack);
 		world.spawnEntity(potion);
 		return true;
 	}
 
-	public boolean applyEggOverride(World world, ItemStack stack) {
+	public boolean applyEggOverride(World world, ItemStack stack, SpawnerContext context) {
 		BlockState blockState = world.getBlockState(this.getPos());
 		EntityType<?> entityType = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
 
-		if(blockState.isOf(Blocks.SPAWNER)) {
+		if(context == SpawnerContext.USE && blockState.isOf(Blocks.SPAWNER)) {
 			BlockEntity blockEntity = world.getBlockEntity(this.getPos());
 
 			if(blockEntity instanceof MobSpawnerBlockEntity) {
@@ -160,8 +160,6 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 
 		Entity entity = entityType2.create((ServerWorld)world, stack.getNbt(), stack.hasCustomName() ? stack.getName() : null, null, blockPos3,
 			SpawnReason.SPAWN_EGG, true, !Objects.equals(this.getPos(), blockPos3) && this.getSide() == Direction.UP);
-
-		boolean isMob = entity instanceof MobEntity;
 
 		if(entity != null && !world.isSpaceEmpty(entity.getBoundingBox())) {
 			entity = null;

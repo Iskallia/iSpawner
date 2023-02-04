@@ -4,6 +4,7 @@ import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.screen.SpawnerControllerScreen;
 import iskallia.ispawner.world.spawner.SpawnerAction;
+import iskallia.ispawner.world.spawner.SpawnerContext;
 import iskallia.ispawner.world.spawner.SpawnerController;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -120,7 +121,7 @@ public class SpawnerControllerItem extends Item {
 				BlockEntity blockEntity = world.getBlockEntity(spawnerPos);
 				if(!(blockEntity instanceof SpawnerBlockEntity)) return;
 				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
-				spawner.manager.spawn(world, world.getRandom(), spawner);
+				spawner.manager.spawn(world, world.getRandom(), spawner, SpawnerContext.USE);
 				player.sendMessage(new LiteralText("Spawned mobs.").formatted(Formatting.GREEN), true);
 			});
 		}

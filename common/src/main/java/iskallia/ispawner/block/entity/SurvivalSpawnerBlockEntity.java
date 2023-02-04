@@ -7,6 +7,7 @@ import iskallia.ispawner.item.nbt.SpawnData;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerAction;
+import iskallia.ispawner.world.spawner.SpawnerContext;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -48,6 +49,7 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 	}
 
 	public static void tick(World world, BlockPos pos, BlockState state, SurvivalSpawnerBlockEntity spawner) {
+		if(world == null || world.isClient()) return;
 		SpawnerSettings newConfig = ModConfigs.SURVIVAL_SPAWNER.defaultSettings.copy();
 		newConfig.setMode(spawner.manager.settings.getMode());
 
@@ -77,7 +79,7 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 			}
 		}
 
-		SpawnerBlockEntity.tick(world, pos, state, spawner);
+		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerContext.SUMMON);
 	}
 
 	@Override

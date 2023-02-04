@@ -3,8 +3,10 @@ package iskallia.ispawner.block;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModItems;
+import iskallia.ispawner.world.spawner.SpawnerContext;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -148,10 +150,13 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 		world.getServer().execute(() -> {
 			BlockEntity blockEntity = world.getBlockEntity(pos);
 
-			if (blockEntity instanceof SpawnerBlockEntity) {
-				SpawnerBlockEntity spawner = (SpawnerBlockEntity) blockEntity;
-				if (spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
-					spawner.manager.spawn(world, world.random, spawner);
+			if(blockEntity instanceof SurvivalSpawnerBlockEntity spawner) {
+				if(spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
+					spawner.manager.spawn(world, world.random, spawner, SpawnerContext.SUMMON);
+				}
+			} else if(blockEntity instanceof SpawnerBlockEntity spawner) {
+				if(spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
+					spawner.manager.spawn(world, world.random, spawner, SpawnerContext.USE);
 				}
 			}
 		});

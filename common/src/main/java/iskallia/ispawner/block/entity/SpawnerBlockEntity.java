@@ -6,6 +6,7 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
+import iskallia.ispawner.world.spawner.SpawnerContext;
 import iskallia.ispawner.world.spawner.SpawnerManager;
 import iskallia.ispawner.world.spawner.SpawnerRenderer;
 import net.minecraft.block.BlockState;
@@ -83,8 +84,8 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuP
 	}
 
 	public static void tick(World world, BlockPos pos, BlockState state, SpawnerBlockEntity spawner) {
-		if(world == null || world.isClient())return;
-		spawner.manager.tick(world, world.getRandom(), spawner);
+		if(world == null || world.isClient()) return;
+		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerContext.USE);
 	}
 
 	@Override

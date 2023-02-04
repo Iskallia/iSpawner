@@ -56,7 +56,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		}
 	}
 
-	public void tick(World world, Random random, SpawnerBlockEntity entity) {
+	public void tick(World world, Random random, SpawnerBlockEntity entity, SpawnerContext context) {
 		BlockPos pos = entity.getPos();
 
 		if(this.settings.getPlayerRadius() >= 0) {
@@ -74,7 +74,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			this.spawnTimer = MathHelper.clamp(this.spawnTimer, 0, this.settings.spawnDelay);
 			this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
 			if(!shouldSpawn) return;
-			this.spawn(world, random, entity);
+			this.spawn(world, random, entity, context);
 			this.tickUses(world, pos);
 		}
 	}
@@ -88,7 +88,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4F, 0.4F);
 	}
 
-	public void spawn(World world, Random random, SpawnerBlockEntity entity) {
+	public void spawn(World world, Random random, SpawnerBlockEntity entity, SpawnerContext context) {
 		if(this.actions.isEmpty()) return;
 
 		WeightedList<Entry> pool = new WeightedList<>();
@@ -124,7 +124,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			if(entity.canUseCharge(entry.stack, entry.index)) {
 				boolean result = this.actions.getRandom(random)
 						.toAbsolute(entity.getCenterPos(), entity.getRotation(), entity.getMirror())
-						.execute(world, entry.stack.copy());
+						.execute(world, entry.stack.copy(), context);
 
 				if(result) {
 					entity.onChargeUsed(entry.stack, entry.index);

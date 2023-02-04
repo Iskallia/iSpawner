@@ -27,6 +27,8 @@ public class SpawnerSettings implements IByteSerializable<SpawnerSettings>, INBT
 		map.put(SpawnGroup.MONSTER, new CapRestriction(SpawnGroup.MONSTER, 16));
 		map.put(SpawnGroup.CREATURE, new CapRestriction(SpawnGroup.CREATURE, -1));
 		map.put(SpawnGroup.AMBIENT, new CapRestriction(SpawnGroup.AMBIENT, -1));
+		map.put(SpawnGroup.AXOLOTLS, new CapRestriction(SpawnGroup.AXOLOTLS, -1));
+		map.put(SpawnGroup.UNDERGROUND_WATER_CREATURE, new CapRestriction(SpawnGroup.UNDERGROUND_WATER_CREATURE, -1));
 		map.put(SpawnGroup.WATER_CREATURE, new CapRestriction(SpawnGroup.WATER_CREATURE, -1));
 		map.put(SpawnGroup.WATER_AMBIENT, new CapRestriction(SpawnGroup.WATER_AMBIENT, -1));
 		map.put(SpawnGroup.MISC, new CapRestriction(SpawnGroup.MISC, -1));

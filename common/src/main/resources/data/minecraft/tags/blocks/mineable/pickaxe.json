@@ -1,7 +1,6 @@
 {
   "replace": "false",
   "values": [
-    "ispawner:survival_spawner",
-    "ispawner:spawner"
+    "ispawner:survival_spawner"
   ]
 }
