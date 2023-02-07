@@ -8,21 +8,6 @@
                     "type": "minecraft:item",
                     "name": "ispawner:survival_spawner"
                 }
-            ],
-            "conditions": [
-                {
-                    "condition": "minecraft:match_tool",
-                    "predicate": {
-                        "enchantments": [
-                            {
-                                "enchantment": "minecraft:silk_touch",
-                                "levels": {
-                                    "min": 1
-                                }
-                            }
-                        ]
-                    }
-                }
             ]
         }
     ]
