@@ -4,8 +4,10 @@ import com.google.gson.annotations.Expose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SpawnEggConfig extends Config {
@@ -19,7 +21,13 @@ public class SpawnEggConfig extends Config {
 
     @Override
     protected void reset() {
-        this.colors = new HashMap<>();
+        this.colors = new LinkedHashMap<>();
+
+        for(EntityType<?> type : Registry.ENTITY_TYPE) {
+            SpawnEggItem egg = SpawnEggItem.forEntity(type);
+            if(egg == null) continue;
+            this.colors.put(EntityType.getId(type), new EggColor(egg.getColor(0), egg.getColor(1)));
+        }
     }
 
     public int getColor(EntityType<?> type, int tintIndex) {
