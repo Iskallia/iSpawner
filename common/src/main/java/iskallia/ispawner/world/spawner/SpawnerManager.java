@@ -5,7 +5,6 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.nbt.INBTSerializable;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.util.WeightedList;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -31,6 +30,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 	public SpawnerSettings settings = new SpawnerSettings();
 	public int spawnTimer;
 	public int usesLeft = -1;
+	public int waveCounter;
 
 	public SpawnerManager() {
 
@@ -56,7 +56,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		}
 	}
 
-	public void tick(World world, Random random, SpawnerBlockEntity entity, SpawnerContext context) {
+	public void tick(World world, Random random, SpawnerBlockEntity entity, SpawnerExecution execution) {
 		BlockPos pos = entity.getPos();
 
 		if(this.settings.getPlayerRadius() >= 0) {
@@ -74,8 +74,9 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			this.spawnTimer = MathHelper.clamp(this.spawnTimer, 0, this.settings.spawnDelay);
 			this.spawnTimer = shouldSpawn ? this.settings.spawnDelay : this.spawnTimer - 1;
 			if(!shouldSpawn) return;
-			this.spawn(world, random, entity, context);
+			this.spawn(world, random, entity, execution);
 			this.tickUses(world, pos);
+			this.waveCounter++;
 		}
 	}
 
@@ -88,7 +89,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4F, 0.4F);
 	}
 
-	public void spawn(World world, Random random, SpawnerBlockEntity entity, SpawnerContext context) {
+	public void spawn(World world, Random random, SpawnerBlockEntity entity, SpawnerExecution execution) {
 		if(this.actions.isEmpty()) return;
 
 		WeightedList<Entry> pool = new WeightedList<>();
@@ -124,7 +125,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 			if(entity.canUseCharge(entry.stack, entry.index)) {
 				boolean result = this.actions.getRandom(random)
 						.toAbsolute(entity.getCenterPos(), entity.getRotation(), entity.getMirror())
-						.execute(world, entry.stack.copy(), context);
+						.execute(world, entry.stack.copy(), new SpawnerContext(execution, entity));
 
 				if(result) {
 					entity.onChargeUsed(entry.stack, entry.index);
@@ -149,6 +150,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		nbt.put("Settings", this.settings.writeToNBT());
 		nbt.putInt("SpawnTimer", this.spawnTimer);
 		if(this.usesLeft >= 0) nbt.putInt("UsesLeft", this.usesLeft);
+		nbt.putInt("WaveCounter", this.waveCounter);
 		return nbt;
 	}
 
@@ -166,6 +168,7 @@ public class SpawnerManager implements INBTSerializable<NbtCompound> {
 		this.settings.readFromNBT(nbt.getCompound("Settings"));
 		this.spawnTimer = nbt.getInt("SpawnTimer");
 		this.usesLeft = nbt.contains("UsesLeft", NBTConstants.INT) ? nbt.getInt("UsesLeft") : -1;
+		this.waveCounter = nbt.getInt("WaveCounter");
 	}
 
 	public static class Entry {

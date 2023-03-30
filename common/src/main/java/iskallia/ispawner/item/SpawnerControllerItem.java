@@ -4,8 +4,8 @@ import iskallia.ispawner.block.SpawnerBlock;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.screen.SpawnerControllerScreen;
 import iskallia.ispawner.world.spawner.SpawnerAction;
-import iskallia.ispawner.world.spawner.SpawnerContext;
 import iskallia.ispawner.world.spawner.SpawnerController;
+import iskallia.ispawner.world.spawner.SpawnerExecution;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
@@ -23,7 +23,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraft.world.spawner.Spawner;
 
 public class SpawnerControllerItem extends Item {
 
@@ -121,7 +120,7 @@ public class SpawnerControllerItem extends Item {
 				BlockEntity blockEntity = world.getBlockEntity(spawnerPos);
 				if(!(blockEntity instanceof SpawnerBlockEntity)) return;
 				SpawnerBlockEntity spawner = (SpawnerBlockEntity)blockEntity;
-				spawner.manager.spawn(world, world.getRandom(), spawner, SpawnerContext.USE);
+				spawner.manager.spawn(world, world.getRandom(), spawner, SpawnerExecution.USE);
 				player.sendMessage(new LiteralText("Spawned mobs.").formatted(Formatting.GREEN), true);
 			});
 		}

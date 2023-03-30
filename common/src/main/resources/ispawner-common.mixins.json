@@ -10,6 +10,7 @@
   "client": [
     "MixinBlockEntityRendererFactories",
     "MixinClientPlayNetworkHandler",
+    "MixinMinecraftClient",
     "MixinRenderLayers"
   ],
   "server": [

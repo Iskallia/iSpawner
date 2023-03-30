@@ -6,7 +6,7 @@ import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModItems;
-import iskallia.ispawner.world.spawner.SpawnerContext;
+import iskallia.ispawner.world.spawner.SpawnerExecution;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -152,11 +152,11 @@ public class SpawnerBlock extends BlockWithEntity implements InventoryProvider {
 
 			if(blockEntity instanceof SurvivalSpawnerBlockEntity spawner) {
 				if(spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
-					spawner.manager.spawn(world, world.random, spawner, SpawnerContext.SUMMON);
+					spawner.manager.spawn(world, world.random, spawner, SpawnerExecution.SUMMON);
 				}
 			} else if(blockEntity instanceof SpawnerBlockEntity spawner) {
 				if(spawner.manager.settings.getMode() == SpawnerSettings.Mode.REDSTONE_PULSE) {
-					spawner.manager.spawn(world, world.random, spawner, SpawnerContext.USE);
+					spawner.manager.spawn(world, world.random, spawner, SpawnerExecution.USE);
 				}
 			}
 		});

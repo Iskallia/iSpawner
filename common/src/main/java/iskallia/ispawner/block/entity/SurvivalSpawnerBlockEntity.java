@@ -3,11 +3,10 @@ package iskallia.ispawner.block.entity;
 import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.init.ModConfigs;
 import iskallia.ispawner.inventory.SimpleInventory;
-import iskallia.ispawner.item.nbt.SpawnData;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SurvivalSpawnerScreenHandler;
 import iskallia.ispawner.world.spawner.SpawnerAction;
-import iskallia.ispawner.world.spawner.SpawnerContext;
+import iskallia.ispawner.world.spawner.SpawnerExecution;
 import iskallia.ispawner.world.spawner.SpawnerSettings;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
@@ -23,8 +22,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.OptionalInt;
 
 public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 
@@ -79,7 +76,7 @@ public class SurvivalSpawnerBlockEntity extends SpawnerBlockEntity {
 			}
 		}
 
-		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerContext.SUMMON);
+		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerExecution.SUMMON);
 	}
 
 	@Override

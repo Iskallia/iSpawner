@@ -6,7 +6,7 @@ import iskallia.ispawner.init.ModBlocks;
 import iskallia.ispawner.inventory.SimpleInventory;
 import iskallia.ispawner.nbt.NBTConstants;
 import iskallia.ispawner.screen.handler.SpawnerScreenHandler;
-import iskallia.ispawner.world.spawner.SpawnerContext;
+import iskallia.ispawner.world.spawner.SpawnerExecution;
 import iskallia.ispawner.world.spawner.SpawnerManager;
 import iskallia.ispawner.world.spawner.SpawnerRenderer;
 import net.minecraft.block.BlockState;
@@ -29,8 +29,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import java.util.Collection;
 
 public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuProvider, NamedScreenHandlerFactory, InventoryChangedListener {
 
@@ -85,7 +83,7 @@ public class SpawnerBlockEntity extends BaseBlockEntity implements ExtendedMenuP
 
 	public static void tick(World world, BlockPos pos, BlockState state, SpawnerBlockEntity spawner) {
 		if(world == null || world.isClient()) return;
-		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerContext.USE);
+		spawner.manager.tick(world, world.getRandom(), spawner, SpawnerExecution.USE);
 	}
 
 	@Override

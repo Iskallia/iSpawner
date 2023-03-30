@@ -22,7 +22,6 @@ import net.minecraft.util.math.Vec3f;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SpawnerBlockRenderer<T extends SpawnerBlockEntity> implements BlockEntityRenderer<T> {

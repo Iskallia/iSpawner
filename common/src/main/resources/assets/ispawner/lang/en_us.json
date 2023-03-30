@@ -4,6 +4,7 @@
   "item.ispawner.spawner_controller": "Spawner Controller",
   "item.ispawner.cage_dust": "Cage Dust",
   "item.ispawner.cage_piece": "Cage Piece",
+  "item.ispawner.spawn_egg": "Spawn Egg",
   "container.spawner": "Spawner",
   "container.survival_spawner": "Survival Spawner"
 }

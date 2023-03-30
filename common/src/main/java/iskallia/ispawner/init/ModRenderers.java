@@ -4,11 +4,13 @@ import dev.architectury.event.events.client.ClientLifecycleEvent;
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
 import iskallia.ispawner.block.entity.SurvivalSpawnerBlockEntity;
 import iskallia.ispawner.block.render.SpawnerBlockRenderer;
+import iskallia.ispawner.item.GenericSpawnEggItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 
 import java.util.Map;
@@ -43,6 +45,12 @@ public class ModRenderers extends ModRegistries {
 					ModRenderers.register(registry, ModBlocks.SURVIVAL_SPAWNER.get(), RenderLayer.getCutout());
 				});
 			}
+		}
+	}
+
+	public static class Colors {
+		public static void register(ItemColors itemColors, BlockColors blockColors) {
+			itemColors.register(GenericSpawnEggItem::getColor, ModItems.SPAWN_EGG.get());
 		}
 	}
 

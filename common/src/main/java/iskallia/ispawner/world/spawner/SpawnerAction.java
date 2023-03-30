@@ -1,6 +1,7 @@
 package iskallia.ispawner.world.spawner;
 
 import iskallia.ispawner.block.entity.SpawnerBlockEntity;
+import iskallia.ispawner.item.GenericSpawnEggItem;
 import iskallia.ispawner.nbt.INBTSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -8,24 +9,32 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.MobSpawnerBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.BlockMirror;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.MobSpawnerLogic;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
+
+import static net.minecraft.entity.EntityType.ENTITY_TAG_KEY;
 
 public class SpawnerAction implements INBTSerializable<NbtCompound> {
 
@@ -92,9 +101,9 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 	public boolean execute(World world, ItemStack stack, SpawnerContext context) {
 		if(stack.getItem() instanceof ThrowablePotionItem) {
 			return this.applyPotionOverride(world, stack, context);
-		} else if(stack.getItem() instanceof SpawnEggItem) {
+		} else if(stack.getItem() instanceof SpawnEggItem || stack.getItem() instanceof GenericSpawnEggItem) {
 			return this.applyEggOverride(world, stack, context);
-		} else if(context == SpawnerContext.USE) {
+		} else if(context.getExecution() == SpawnerExecution.USE) {
 			stack.useOnBlock(new SpawnerUsageContext(world, stack, this));
 		}
 
@@ -124,7 +133,7 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 	}
 
 	public boolean applyPotionOverride(World world, ItemStack stack, SpawnerContext context) {
-		if(context != SpawnerContext.USE) return false;
+		if(context.getExecution() != SpawnerExecution.USE) return false;
 		PotionEntity potion = new PotionEntity(world, this.getHitPos().getX(), this.getHitPos().getY(), this.getHitPos().getZ());
 		potion.setItem(stack);
 		world.spawnEntity(potion);
@@ -132,34 +141,37 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 	}
 
 	public boolean applyEggOverride(World world, ItemStack stack, SpawnerContext context) {
-		BlockState blockState = world.getBlockState(this.getPos());
-		EntityType<?> entityType = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
+		BlockState state = world.getBlockState(this.getPos());
+		EntityType<?> type = GenericSpawnEggItem.getType(stack);
 
-		if(context == SpawnerContext.USE && blockState.isOf(Blocks.SPAWNER)) {
+		if(context.getExecution() == SpawnerExecution.USE && state.isOf(Blocks.SPAWNER)) {
 			BlockEntity blockEntity = world.getBlockEntity(this.getPos());
 
-			if(blockEntity instanceof MobSpawnerBlockEntity) {
-				MobSpawnerLogic mobSpawnerLogic = ((MobSpawnerBlockEntity)blockEntity).getLogic();
-				mobSpawnerLogic.setEntityId(entityType);
-				blockEntity.markDirty();
-				world.updateListeners(this.getPos(), blockState, blockState, 3);
-				stack.decrement(1);
+			if(blockEntity instanceof MobSpawnerBlockEntity spawner) {
+				if(type != null) {
+					spawner.getLogic().setEntityId(type);
+					spawner.markDirty();
+					world.updateListeners(this.getPos(), state, state, 3);
+					stack.decrement(1);
+				}
+
 				return true;
 			}
 		}
 
-		BlockPos blockPos3;
+		BlockPos pos;
 
-		if(blockState.getCollisionShape(world, this.getPos()).isEmpty()) {
-			blockPos3 = this.getPos();
+		if(state.getCollisionShape(world, this.getPos()).isEmpty()) {
+			pos = this.getPos();
 		} else {
-			blockPos3 = this.getPos().offset(this.getSide());
+			pos = this.getPos().offset(this.getSide());
 		}
 
-		EntityType<?> entityType2 = ((SpawnEggItem)stack.getItem()).getEntityType(stack.getNbt());
+		stack.getOrCreateSubNbt(ENTITY_TAG_KEY).put("Spawner", context.getEntity().createNbt());
 
-		Entity entity = entityType2.create((ServerWorld)world, stack.getNbt(), stack.hasCustomName() ? stack.getName() : null, null, blockPos3,
-			SpawnReason.SPAWN_EGG, true, !Objects.equals(this.getPos(), blockPos3) && this.getSide() == Direction.UP);
+		Entity entity = create(type, (ServerWorld)world, stack.getNbt(), stack.hasCustomName() ? stack.getName() : null,
+			null, pos, SpawnReason.SPAWN_EGG, true,
+			!Objects.equals(this.getPos(), pos) && this.getSide() == Direction.UP);
 
 		if(entity != null && !world.isSpaceEmpty(entity.getBoundingBox())) {
 			entity = null;
@@ -172,6 +184,49 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 		}
 
 		return false;
+	}
+
+	@Nullable
+	public <T extends Entity> T create(EntityType<T> type, ServerWorld world, @Nullable NbtCompound itemNbt, @Nullable Text name, @Nullable PlayerEntity player, BlockPos pos, SpawnReason spawnReason, boolean alignPosition, boolean invertY) {
+		if(type == null) return null;
+		T entity = type.create(world);
+		if(entity == null) return null;
+
+		double offsetY;
+
+		if(alignPosition) {
+			entity.setPosition(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 1.0D);
+			offsetY = getOriginY(world, pos, invertY, entity.getBoundingBox());
+		} else {
+			offsetY = 0.0;
+		}
+
+		entity.refreshPositionAndAngles(pos.getX() + 0.5D, pos.getY() + offsetY, pos.getZ() + 0.5D,
+			MathHelper.wrapDegrees(world.random.nextFloat() * 360.0F), 0.0F);
+
+		if(entity instanceof MobEntity mob) {
+			mob.headYaw = mob.getYaw();
+			mob.bodyYaw = mob.getYaw();
+			mob.initialize(world, world.getLocalDifficulty(mob.getBlockPos()), spawnReason, null, itemNbt);
+		}
+
+		if(name != null && entity instanceof LivingEntity) {
+			entity.setCustomName(name);
+		}
+
+		EntityType.loadFromEntityNbt(world, player, entity, itemNbt);
+		return entity;
+	}
+
+	protected static double getOriginY(WorldView world, BlockPos pos, boolean invertY, Box boundingBox) {
+		Box box = new Box(pos);
+
+		if(invertY) {
+			box = box.stretch(0.0D, -1.0D, 0.0D);
+		}
+
+		Iterable<VoxelShape> iterable = world.getCollisions(null, box);
+		return 1.0D + VoxelShapes.calculateMaxOffset(Direction.Axis.Y, boundingBox, iterable, invertY ? -2.0D : -1.0D);
 	}
 
 	@Override
