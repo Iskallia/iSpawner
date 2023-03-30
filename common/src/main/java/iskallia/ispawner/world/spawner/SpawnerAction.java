@@ -142,7 +142,9 @@ public class SpawnerAction implements INBTSerializable<NbtCompound> {
 
 	public boolean applyEggOverride(World world, ItemStack stack, SpawnerContext context) {
 		BlockState state = world.getBlockState(this.getPos());
-		EntityType<?> type = GenericSpawnEggItem.getType(stack);
+		EntityType<?> type = stack.getItem() instanceof SpawnEggItem egg
+			? egg.getEntityType(stack.getNbt())
+			: GenericSpawnEggItem.getType(stack);
 
 		if(context.getExecution() == SpawnerExecution.USE && state.isOf(Blocks.SPAWNER)) {
 			BlockEntity blockEntity = world.getBlockEntity(this.getPos());
